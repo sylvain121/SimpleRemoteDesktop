@@ -10,6 +10,6 @@
     "bufferpack": "0.0.6",
     "c-struct": "0.0.3",
     "node-avcodec-h264-encoder": "git+https://github.com/sylvain121/node-avcodec-h264-encoder.git",
-    "node-x11": "^1.0.1"
+    "node-x11": "git+https://github.com/sylvain121/node-X11.git"
   }
 }
