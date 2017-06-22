@@ -39,7 +39,6 @@ module.exports.stop = function() {
 
 
 function getFrame() {
-    console.log("get image");
     if (!running) {
         x11.init();
     }
@@ -50,6 +49,7 @@ function getFrame() {
     options.screen.bpp = img.bits_per_pixel;
 
     if (!running) {
+        setMouseDistantScreenSize(options.distant.width, options.distant.height);
         console.log("init with parameters : ", options.screen.width, options.screen.height, options.distant.width, options.distant.height, options.screen.bpp);
         encoder.initSync(options.screen.width, options.screen.height, options.distant.width, options.distant.height, options.screen.bpp);
         running = true;
@@ -57,7 +57,6 @@ function getFrame() {
 
     var frame = encoder.encodeFrameSync(img.data);
     if (frame !== undefined) {
-        console.log(typeof socket.getSocket());
         socket.getSocket().write(frame);
     }
 }
@@ -79,9 +78,9 @@ module.exports.isConfigured = function() {
     return x_ratio > 0 && y_ratio > 0;
 }
 
-module.exports.setMouseDistantScreenSize = function(width, height) {
-    x_ratio = params.screen.width / width;
-    y_ratio = params.screen.height / height;
+function setMouseDistantScreenSize(width, height) {
+    x_ratio = options.screen.width / width;
+    y_ratio = options.screen.height / height;
 
 
 
@@ -99,21 +98,9 @@ module.exports.mouseMove = function(x, y) {
  */
 module.exports.mouseToggle = function(button, newStat) {
 
-    var button_int = 0;
     var isDown = false;
     isDown = (newStat === "down") ? true : false;
-    switch (button) {
-        case "left":
-            button_int = 1;
-            break;
-        case "middle":
-            button_int = 2;
-            break;
-        case "right":
-            button_int = 3;
-            break;
-    }
-    x11.mouseButton(button_int, isDown);
+    x11.mouseButton(button, isDown);
 
 }
 
@@ -128,11 +115,11 @@ module.exports.mouseToggle = function(button, newStat) {
 module.exports.toggleKeyDown = function(keyCode) {
     console.log("keycode", "down", keyCode, typeof keyCode);
     if (keyCode <= 0) return console.log("unknow keyCode : " + keyCode);
-    x11.keyPress(keyCode, true);
+    x11.keyPressWithKeysym(keyCode, true);
 }
 
 
 module.exports.toggleKeyUp = function(keyCode) {
     if (keyCode <= 0) return console.log("unknow keyCode : " + keyCode);
-    x11.keyPress(keyCode, false);
+    x11.keyPressWithKeysym(keyCode, false);
 }

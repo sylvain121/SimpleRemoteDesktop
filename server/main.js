@@ -10,6 +10,7 @@ socket.registerMessageHandler(onNewMessage);
 
 function onNewMessage(message) {
 
+    console.log(message.type);
     switch (message.type) {
         case 1:
             console.log("keydown : " + message.keycode);
@@ -34,6 +35,9 @@ function onNewMessage(message) {
             break;
         case 7:
             capture.stop();
+            break;
+        default:
+            console.log(message);
             break;
     }
 

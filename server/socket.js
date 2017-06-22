@@ -52,21 +52,26 @@ server.listen(port, function() {
 });
 
 function messageHandler(data) {
-    buffer = Buffer.concat([buffer, new Buffer(data, 'hex')]);
-    var message = {
-        type: parseInt(read(4).readUInt32LE().toString(), 10),
-        x: parseInt(read(4).readUInt32LE().toString(), 10),
-        y: parseInt(read(4).readUInt32LE().toString(), 10),
-        button: parseInt(read(4).readUInt32LE().toString(), 10),
-        keycode: parseInt(read(4).readUInt32LE().toString(), 10),
-        width: parseInt(read(4).readUInt32LE().toString(), 10),
-        height: parseInt(read(4).readUInt32LE().toString(), 10),
-        fps: parseInt(read(4).readUInt32LE().toString(), 10)
+
+    buffer = Buffer.concat([buffer, data]);
+
+    while (buffer.length > 32) {
+
+        console.log(buffer.length);
+        var message = {
+            type: parseInt(read(4).readInt32LE().toString(), 10),
+            x: parseInt(read(4).readInt32LE().toString(), 10),
+            y: parseInt(read(4).readInt32LE().toString(), 10),
+            button: parseInt(read(4).readInt32LE().toString(), 10),
+            keycode: parseInt(read(4).readInt32LE().toString(), 10),
+            width: parseInt(read(4).readInt32LE().toString(), 10),
+            height: parseInt(read(4).readInt32LE().toString(), 10),
+            fps: parseInt(read(4).readInt32LE().toString(), 10)
+        }
+
+        console.log(message);
+        onNewMessageHandler(message);
     }
-
-    console.log(message);
-    onNewMessageHandler(message);
-
 }
 
 

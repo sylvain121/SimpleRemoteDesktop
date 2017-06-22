@@ -1,5 +1,9 @@
 // remote desktop sdl client
 #include <stdbool.h>
+#include<stdint.h>
+
+
+
 
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -221,49 +225,56 @@ int main(int argc, char *argv[]) {
 		while(SDL_PollEvent(&userEvent)) {
 
 			struct Message send; 
-
+			
 			switch(userEvent.type) {
 				case SDL_QUIT: 
 					quit = true;
 					break;
 
 				case SDL_KEYDOWN: 
-					//printf("pressed key %d\n", userEvent.key.keysym.scancode);
+					printf("pressed key %d\n", userEvent.key.keysym.sym);
 					send.type = TYPE_KEY_DOWN;
 					send.keycode = userEvent.key.keysym.sym;
+					SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 					break;
 
 				case SDL_KEYUP: 
-					//printf("released key %d\n", userEvent.key.keysym.sym);
+					printf("released key %d\n", userEvent.key.keysym.sym);
 					send.type = TYPE_KEY_UP;
-					send.keycode = userEvent.key.keysym.scancode;
+					send.keycode = userEvent.key.keysym.sym;
+					SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 					break;				
 
 				case SDL_MOUSEMOTION: 
-					//printf("mouse position x: %d, y: %d \n", userEvent.motion.x, userEvent.motion.y);
+					printf("mouse position x: %d, y: %d \n", userEvent.motion.x, userEvent.motion.y);
 					send.type = TYPE_MOUSE_MOTION;
-					send.x = userEvent.motion.x;
-					send.y = userEvent.motion.y;
+					send.x = (int) userEvent.motion.x;
+					send.y = (int) userEvent.motion.y;
+					SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 					break;
 				case SDL_MOUSEBUTTONDOWN: {
 								  send.type = TYPE_MOUSE_DOWN;
 								  switch(userEvent.button.button) {
 									  case SDL_BUTTON_LEFT: {
-													//printf("left click down\n");
+													printf("left click down\n");
 													send.button = 1;
+													SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 													break;
 												}
 									  case SDL_BUTTON_RIGHT: {
-													 //printf("right click down\n");
+													 printf("right click down\n");
 													 send.button = 3;
+													 SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 													 break;
 												 }
 									  case SDL_BUTTON_MIDDLE: {
-													  //printf("middle click down\n");
+													  printf("middle click down\n");
 													  send.button = 2;
+													  SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 													  break;
 												  }
 								  }
+								  SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 								  break;
 							  }
 
@@ -271,27 +282,32 @@ int main(int argc, char *argv[]) {
 								   send.type = TYPE_MOUSE_UP;
 								   switch(userEvent.button.button) {
 									   case SDL_BUTTON_LEFT: {
-													 //printf("left click released\n");
+													 printf("left click released\n");
 													 send.button = 1;
+													 SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 													 break;
 												 }
 									   case SDL_BUTTON_RIGHT: {
-													  //printf("right click released\n");
+													  printf("right click released\n");
 													  send.button = 3;
+													  SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 													  break;
 												  }
 									   case SDL_BUTTON_MIDDLE: {
-													   //printf("middle click released\n");
+													   printf("middle click released\n");
 													   send.button = 2;
+													   SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 													   break;
 												   }
 								   }
+								   SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 								   break;
 							   }
-
+ 
+				
 			}
 
-			SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
+			
 
 		}
 
