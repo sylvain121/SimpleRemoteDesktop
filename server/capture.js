@@ -87,9 +87,10 @@ function setMouseDistantScreenSize(width, height) {
 }
 
 module.exports.mouseMove = function(x, y) {
-    console.log(x, x_ratio, y, y_ratio)
-    x11.mouseMove(x * x_ratio, y * y_ratio);
-
+    if (running) {
+        console.log(x, x_ratio, y, y_ratio)
+        x11.mouseMove(x * x_ratio, y * y_ratio);
+    };
 }
 
 /**
@@ -98,9 +99,12 @@ module.exports.mouseMove = function(x, y) {
  */
 module.exports.mouseToggle = function(button, newStat) {
 
-    var isDown = false;
-    isDown = (newStat === "down") ? true : false;
-    x11.mouseButton(button, isDown);
+    if (running) {
+        var isDown = false;
+        isDown = (newStat === "down") ? true : false;
+        x11.mouseButton(button, isDown);
+    };
+
 
 }
 
@@ -113,13 +117,17 @@ module.exports.mouseToggle = function(button, newStat) {
 
 
 module.exports.toggleKeyDown = function(keyCode) {
-    console.log("keycode", "down", keyCode, typeof keyCode);
-    if (keyCode <= 0) return console.log("unknow keyCode : " + keyCode);
-    x11.keyPressWithKeysym(keyCode, true);
+    if (running && keyCode < 1000) {
+        console.log("keycode", "down", keyCode, typeof keyCode);
+        if (keyCode <= 0) return console.log("unknow keyCode : " + keyCode);
+        x11.keyPressWithKeysym(keyCode, true);
+    };
 }
 
 
 module.exports.toggleKeyUp = function(keyCode) {
-    if (keyCode <= 0) return console.log("unknow keyCode : " + keyCode);
-    x11.keyPressWithKeysym(keyCode, false);
+    if (running && keyCode < 1000) {
+        if (keyCode <= 0) return console.log("unknow keyCode : " + keyCode);
+        x11.keyPressWithKeysym(keyCode, false);
+    }
 }
