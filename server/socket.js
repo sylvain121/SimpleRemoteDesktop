@@ -28,6 +28,8 @@ var server = net.createServer(function(socket) {
     if (!userSocket) {
         console.log("set new userSocket");
         userSocket = socket;
+
+
     } else {
         socket.end();
     }
@@ -39,6 +41,7 @@ var server = net.createServer(function(socket) {
             }
         })
         .on('data', function(data) {
+            console.log("new tcp message");
             messageHandler(data);
         });
 
@@ -57,7 +60,7 @@ function messageHandler(data) {
 
     while (buffer.length > 32) {
 
-        console.log(buffer.length);
+
         var message = {
             type: parseInt(read(4).readInt32LE().toString(), 10),
             x: parseInt(read(4).readInt32LE().toString(), 10),
@@ -69,7 +72,7 @@ function messageHandler(data) {
             fps: parseInt(read(4).readInt32LE().toString(), 10)
         }
 
-        console.log(message);
+        //console.log(message);
         onNewMessageHandler(message);
     }
 }

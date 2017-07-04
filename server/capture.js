@@ -1,6 +1,7 @@
 const x11 = require("node-x11");
 const encoder = require('node-avcodec-h264-encoder');
 const socket = require("./socket");
+const SDLKey = require('./SDLKeysymToX11Keysym');
 
 var timer = null;
 var running = false;
@@ -41,6 +42,8 @@ module.exports.stop = function() {
 function getFrame() {
     if (!running) {
         x11.init();
+        SDLKey.SDLKeyToKeySym_init();
+
     }
     var img = x11.getImage();
 
@@ -117,17 +120,17 @@ module.exports.mouseToggle = function(button, newStat) {
 
 
 module.exports.toggleKeyDown = function(keyCode) {
-    if (running && keyCode < 1000) {
+    if (running) {
         console.log("keycode", "down", keyCode, typeof keyCode);
         if (keyCode <= 0) return console.log("unknow keyCode : " + keyCode);
-        x11.keyPressWithKeysym(keyCode, true);
+        x11.keyPressWithKeysym(SDLKey.SDLKeyToKeySym(keyCode), true);
     };
 }
 
 
 module.exports.toggleKeyUp = function(keyCode) {
-    if (running && keyCode < 1000) {
+    if (running) {
         if (keyCode <= 0) return console.log("unknow keyCode : " + keyCode);
-        x11.keyPressWithKeysym(keyCode, false);
+        x11.keyPressWithKeysym(SDLKey.SDLKeyToKeySym(keyCode), false);
     }
 }

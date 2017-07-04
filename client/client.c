@@ -224,7 +224,8 @@ int main(int argc, char *argv[]) {
 		 
 		while(SDL_PollEvent(&userEvent)) {
 
-			struct Message send; 
+			struct Message send;
+
 			
 			switch(userEvent.type) {
 				case SDL_QUIT: 
