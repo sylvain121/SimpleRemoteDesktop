@@ -1,6 +1,11 @@
 // remote desktop sdl client
 #include <stdbool.h>
 #include<stdint.h>
+#include<time.h>
+
+
+
+
 
 
 
@@ -149,7 +154,7 @@ int main(int argc, char *argv[]) {
 			screen_width, //TODO
 			screen_height, //TODO
 			PIX_FMT_YUV420P,
-			SWS_BILINEAR,
+			SWS_FAST_BILINEAR,
 			NULL,
 			NULL,
 			NULL
@@ -224,8 +229,7 @@ int main(int argc, char *argv[]) {
 		 
 		while(SDL_PollEvent(&userEvent)) {
 
-			struct Message send;
-
+			struct Message send; 
 			
 			switch(userEvent.type) {
 				case SDL_QUIT: 
@@ -342,14 +346,16 @@ int main(int argc, char *argv[]) {
 			int lenght;
 			// Decode video frame
 			int frameFinished;
-
+			int beforeTime = (unsigned long) time(NULL);
 			lenght = avcodec_decode_video2(pCodecCtx, pFrame, &frameFinished, &packet);
+
+
 			if( lenght < 0 ) {
 				fprintf(stderr, "Error while decoding frame\n");
 			}
 			// Did we get a video frame?
 			if(frameFinished) {
-
+			printf(" decode time : %lu \n", beforeTime - (unsigned long) time(NULL));
 				AVPicture pict;
 				pict.data[0] = yPlane;
 				pict.data[1] = uPlane;

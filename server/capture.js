@@ -20,6 +20,14 @@ var options = {
 }
 
 
+function free() {
+    var x11ModuleName = require.resolve("node-x11");
+    var encoderModuleName = require.resolve('node-avcodec-h264-encoder');
+
+    delete require.cache[x11ModuleName];
+    delete require.cache[encoderModuleName];
+}
+
 
 module.exports.start = function(distantWidth, distantHeight) {
 
@@ -40,13 +48,14 @@ module.exports.stop = function() {
 
 
 function getFrame() {
+    var initTime = new Date();
     if (!running) {
         x11.init();
         SDLKey.SDLKeyToKeySym_init();
 
     }
     var img = x11.getImage();
-
+    var getImageTime = new Date();
     options.screen.width = img.width;
     options.screen.height = img.height;
     options.screen.bpp = img.bits_per_pixel;
@@ -61,6 +70,8 @@ function getFrame() {
     var frame = encoder.encodeFrameSync(img.data);
     if (frame !== undefined) {
         socket.getSocket().write(frame);
+        var frameTime = new Date();
+        console.log("getImage Time:", getImageTime - initTime, "encoder time : ", frameTime - getImageTime, "global send time : ", frameTime - initTime);
     }
 }
 

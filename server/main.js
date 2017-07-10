@@ -1,8 +1,31 @@
 var capture = require('./capture');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var socket = require('./socket');
 
 
 socket.registerMessageHandler(onNewMessage);
+socket.registerdisconnectHander(capture.free);
 
 
 

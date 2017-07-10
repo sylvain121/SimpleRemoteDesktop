@@ -2,6 +2,7 @@ var net = require('net');
 var userSocket = null;
 var port = 8001;
 var onNewMessageHandler = null;
+var disconnectHander = null;
 
 var buffer = new Buffer(0);
 
@@ -17,6 +18,7 @@ module.exports.registerMessageHandler = function(mh) {
     onNewMessageHandler = mh;
 }
 
+module.exports.registerdisconnectHander = (dd) => disconnectHander = dd;
 module.exports.getWriteFn = function() {
     if (userSocket) return userSocket.write();
     console.log("!!! WARN no socket");
@@ -32,6 +34,7 @@ var server = net.createServer(function(socket) {
 
     } else {
         socket.end();
+        disconnectHander();
     }
 
     socket.on('close', function() {
@@ -55,10 +58,11 @@ server.listen(port, function() {
 });
 
 function messageHandler(data) {
-
+    console.log("buffer size : " + buffer.length);
+    console.log("input data size: " + data.length);
     buffer = Buffer.concat([buffer, data]);
 
-    while (buffer.length > 32) {
+    while (buffer.length >= 32) {
 
 
         var message = {
