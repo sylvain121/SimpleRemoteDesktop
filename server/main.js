@@ -28,7 +28,7 @@ function onNewMessage(message) {
             capture.mouseToggle(message.button);
             break;
         case 6:
-            capture.start(message.width, message.height);
+            capture.start(message.width, message.height, message.codecWidth, message.codecHeight, message.bandwidth, message.fps);
             break;
         case 7:
             capture.stop();

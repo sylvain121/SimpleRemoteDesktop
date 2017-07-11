@@ -44,7 +44,6 @@ var server = net.createServer(function(socket) {
             }
         })
         .on('data', function(data) {
-            console.log("new tcp message");
             messageHandler(data);
         })
         .on('error', function() {
@@ -65,7 +64,7 @@ function messageHandler(data) {
 
     buffer = Buffer.concat([buffer, data]);
 
-    while (buffer.length >= 32) {
+    while (buffer.length >= 44) {
 
 
         var message = {
@@ -76,6 +75,9 @@ function messageHandler(data) {
             keycode: parseInt(read(4).readInt32LE().toString(), 10),
             width: parseInt(read(4).readInt32LE().toString(), 10),
             height: parseInt(read(4).readInt32LE().toString(), 10),
+            codecWidth: parseInt(read(4).readInt32LE().toString(), 10),
+            codecHeight: parseInt(read(4).readInt32LE().toString(), 10),
+            bandwidth: parseInt(read(4).readInt32LE().toString(), 10),
             fps: parseInt(read(4).readInt32LE().toString(), 10)
         }
 

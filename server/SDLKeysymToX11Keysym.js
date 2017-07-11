@@ -101,6 +101,7 @@ module.exports.SDLKeyToKeySym_init = function() {
     keymap[SDL_SCANCODE_TO_KEYCODE(154)] = 0xff15; //		= 317,
     //keymap[SDLK_BREAK] = 0xff6b; //		= 318,
     keymap[SDL_SCANCODE_TO_KEYCODE(118)] = 0xff67; //		= 319,
+    keymap[1073741824] = 0xffe3;
 }
 
 

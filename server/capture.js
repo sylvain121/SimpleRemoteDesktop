@@ -11,6 +11,8 @@ var options = {
     inputHeight: 0,
     outputWidth: 0,
     outputHeight: 0,
+    distantDisplayWidth: 0,
+    distantDisplayHeight: 0,
     bit_rate: 10000000,
     fps: 60,
     sample: encoder.YUV_420P
@@ -27,10 +29,14 @@ function free() {
 }
 
 
-module.exports.start = function(distantWidth, distantHeight) {
+module.exports.start = function(distantWidth, distantHeight, codecWidth, codecHeight, bandwidth, fps) {
 
-    options.outputWidth = distantWidth;
-    options.outputHeight = distantHeight;
+    options.outputWidth = codecWidth;
+    options.outputHeight = codecHeight;
+    options.distantDisplayWidth = distantWidth;
+    options.distantDisplayHeight = distantHeight;
+    options.bit_rate = bandwidth;
+    options.fps = fps;
     timer = setInterval(getFrame, 1000 / options.fps);
 }
 
@@ -52,20 +58,23 @@ function getFrame() {
         SDLKey.SDLKeyToKeySym_init();
 
     }
+
     var img = x11.getImage();
     var getImageTime = new Date();
     options.inputWidth = img.width;
     options.inputHeight = img.height;
 
     if (!running) {
-        setMouseDistantScreenSize(options.outputWidth, options.outputHeight);
-        console.log("init with parameters : ", options.inputWidth, options.inputHeight, options.outputWidth, options.outputHeight);
+        setMouseDistantScreenSize(options.distantDisplayWidth, options.distantDisplayHeight);
+        console.log("init video stream");
+        console.log(options);
         encoder.initSync(options);
         running = true;
     }
 
     var frame = encoder.encodeFrameSync(img.data);
     if (frame !== undefined) {
+        if (socket.getSocket() == null) free();
         socket.getSocket().write(frame);
         var frameTime = new Date();
         //console.log("getImage Time:", getImageTime - initTime, "encoder time : ", frameTime - getImageTime, "global send time : ", frameTime - initTime);
@@ -92,9 +101,6 @@ module.exports.isConfigured = function() {
 function setMouseDistantScreenSize(width, height) {
     x_ratio = options.inputWidth / width;
     y_ratio = options.inputHeight / height;
-
-
-
 }
 
 module.exports.mouseMove = function(x, y) {
@@ -114,8 +120,6 @@ module.exports.mouseToggle = function(button, newStat) {
         isDown = (newStat === "down") ? true : false;
         x11.mouseButton(button, isDown);
     };
-
-
 }
 
 

@@ -3,6 +3,13 @@
 #include<stdint.h>
 #include<time.h>
 
+
+
+
+
+
+
+
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
@@ -28,8 +35,7 @@
 
 enum type {TYPE_KEY_DOWN=1, TYPE_KEY_UP=2, TYPE_MOUSE_MOTION=3, TYPE_MOUSE_DOWN=4, TYPE_MOUSE_UP=5 , TYPE_ENCODER_START=6, TYPE_ENCODER_STOP=7 };
 
-struct Message
-{
+struct Message {
 	int type;
 	int x;
 	int y;
@@ -37,71 +43,19 @@ struct Message
 	int keycode;
 	int width;
 	int height;
-	int codec_width;
-	int codec_height;
-	int bandwidth;
 	int fps;
 };
 
 
-int main(int argc, char *argv[]) 
-{
+int main(int argc, char *argv[]) {
 
-
-	fprintf(stdout, "init() \n");
-	int screen_width = 1280;
-	int screen_height = 720;
-	int codec_width = 800;
-	int codec_height = 600;
-	int bandwidth = 10000000;
+	fprintf(stdout, "init()");
+	int screen_width = 1920;
+	int screen_height = 1080;
+	int codec_width = 1280;
+	int codec_height = 720;
 	int fps = 25;
 
-	char* hostname = strdup(argv[1]);
-
-	int port = atoi(argv[2]);
-
-	char* video_definition = argv[3];
-
-
-	if(argv[4] != NULL && atoi(argv[4]) > 0) // have custom bandwidth
-{
-bandwidth = atoi(argv[4]);
-}	
-
-if(argv[4] != NULL && atoi(argv[5]) > 0) //have custom fps
-{
-fps = atoi(argv[5]); 
-}
-
-
-	
- printf("parameters hostname : %s, port : %d, video resolution : %s, bandwidth : %dKb, fps : %d \n", hostname, port, video_definition, bandwidth, fps);
-
- 
-if(video_definition != NULL)
-{
- if(strcmp("720p", video_definition) == 0)
- {
-	codec_width = 1280;
-	codec_height = 720;
-	printf("swicth video resolution to %dx%d \n", codec_width, codec_height);
- }  
-
- if(strcmp("1080p", video_definition) == 0)
- {
-	screen_width = codec_width = 1920;
-	screen_height = codec_height = 1080;
-	printf("swicth video resolution to %dx%d \n", codec_width, codec_height);
- } 
-} 
-
-
-
-
-	/** key press logger for exit event ctrl + alt+ q **/
-	int ctrl_press = false;
-	int alt_press = false;
-	
 	// SDL Event
 	SDL_Event userEvent;
 	bool quit = false;
@@ -163,9 +117,8 @@ if(video_definition != NULL)
 	// Allocate video frame
 	pFrame=av_frame_alloc();
 
-
 	// Make a screen to put our video
-	printf("Make a screen to put our video \n");
+	printf("Make a screen to put our video");
 	screen = SDL_CreateWindow(
 			"StreamMyDesktop Client",
 			SDL_WINDOWPOS_UNDEFINED,
@@ -184,7 +137,7 @@ if(video_definition != NULL)
 
 	// Allocate a place to put our YUV image on that screen
 
-	printf("Allocate a place to put our YUV image on that screen\n ");
+	printf("Allocate a place to put our YUV image on that screen");
 	bmp = SDL_CreateTexture(
 			renderer,
 			SDL_PIXELFORMAT_YV12,
@@ -194,12 +147,12 @@ if(video_definition != NULL)
 			);
 
 	// initialize SWS context for software scaling
-	printf("initialize SWS context for software scaling\n ");
+	printf("initialize SWS context for software scaling");
 	sws_ctx = sws_getContext(pCodecCtx->width,
 			pCodecCtx->height,
 			pCodecCtx->pix_fmt,
-			codec_width, 
-			codec_height,
+			codec_width, //TODO
+			codec_height, //TODO
 			PIX_FMT_YUV420P,
 			SWS_FAST_BILINEAR,
 			NULL,
@@ -209,7 +162,7 @@ if(video_definition != NULL)
 
 
 	// set up YV12 pixel array (12 bits per pixel)
-	printf("set up YV12 pixel array (12 bits per pixel)\n ");
+	printf("set up YV12 pixel array (12 bits per pixel)");
 	yPlaneSz = screen_width * screen_height;
 	uvPlaneSz = screen_width * screen_height / 4;
 	yPlane = (Uint8*)malloc(yPlaneSz);
@@ -229,7 +182,7 @@ if(video_definition != NULL)
 	 *
 	 */
 
-	fprintf(stdout, "video width : %i, height : %i, fps : %i\n ", pCodecCtx->width, pCodecCtx->height, fps);
+	fprintf(stdout, "video width : %i, height : %i, fps : %i", pCodecCtx->width, pCodecCtx->height, fps);
 	IPaddress ip;
 	TCPsocket sd;
 
@@ -238,7 +191,7 @@ if(video_definition != NULL)
 		exit(EXIT_FAILURE);
 	}
 
-	if(SDLNet_ResolveHost(&ip, hostname, port) < 0) {
+	if(SDLNet_ResolveHost(&ip, argv[1], atoi(argv[2])) < 0) {
 		fprintf(stderr, "unable to resolve address %s , port %s \n", argv[1], argv[2]);
 		exit(1);
 	} 
@@ -250,13 +203,9 @@ if(video_definition != NULL)
 	// inital packet with information
 	struct Message init;
 	init.type = TYPE_ENCODER_START;
-	init.width = screen_width;
-	init.height = screen_height;
+	init.width = codec_width;
+	init.height = codec_height;
 	init.fps = fps;
-	init.codec_width = codec_width;
-	init.codec_height = codec_height;
-	init.bandwidth = bandwidth;
-
 
 	SDLNet_TCP_Send(sd, (void * )&init, sizeof(init));
 
@@ -272,9 +221,7 @@ if(video_definition != NULL)
 	int inbuf_average = 0;
 
 
-	int screen_is_fullscreen = 0;
-
-	printf("start event loop\n ");
+	printf("start event loop");
 	for(;;) {
 
 
@@ -290,51 +237,21 @@ if(video_definition != NULL)
 					break;
 
 				case SDL_KEYDOWN: 
-					//printf("pressed key %d\n", userEvent.key.keysym.sym);
+					printf("pressed key %d\n", userEvent.key.keysym.sym);
 					send.type = TYPE_KEY_DOWN;
 					send.keycode = userEvent.key.keysym.sym;
-					if(userEvent.key.keysym.sym == 1073742048){
-						ctrl_press = true;
-					} 
-					if(userEvent.key.keysym.sym == 1073742050){
-						alt_press = true;
-					} 
-					if(userEvent.key.keysym.sym == 113 && ctrl_press && alt_press){
-						quit = true;
-					} else 	if(userEvent.key.keysym.sym == 102 && ctrl_press && alt_press){
-						if(screen_is_fullscreen) 
-					{
-						screen_is_fullscreen = false;
-						SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN_DESKTOP);						
-					} 
-					else
-					{
-						screen_is_fullscreen = true;
-						SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN);
-					} 
-						
-					} else {
 					SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
-					} 
-
-
 					break;
 
 				case SDL_KEYUP: 
-					//printf("released key %d\n", userEvent.key.keysym.sym);
+					printf("released key %d\n", userEvent.key.keysym.sym);
 					send.type = TYPE_KEY_UP;
 					send.keycode = userEvent.key.keysym.sym;
-					if(userEvent.key.keysym.sym == 1073742048){
-						ctrl_press = false;
-					} 
-					if(userEvent.key.keysym.sym == 1073742050){
-						alt_press = false;
-					}
 					SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 					break;				
 
 				case SDL_MOUSEMOTION: 
-					//printf("mouse position x: %d, y: %d \n", userEvent.motion.x, userEvent.motion.y);
+					printf("mouse position x: %d, y: %d \n", userEvent.motion.x, userEvent.motion.y);
 					send.type = TYPE_MOUSE_MOTION;
 					send.x = (int) userEvent.motion.x;
 					send.y = (int) userEvent.motion.y;
@@ -344,19 +261,19 @@ if(video_definition != NULL)
 								  send.type = TYPE_MOUSE_DOWN;
 								  switch(userEvent.button.button) {
 									  case SDL_BUTTON_LEFT: {
-													//printf("left click down\n");
+													printf("left click down\n");
 													send.button = 1;
 													SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 													break;
 												}
 									  case SDL_BUTTON_RIGHT: {
-													 //printf("right click down\n");
+													 printf("right click down\n");
 													 send.button = 3;
 													 SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 													 break;
 												 }
 									  case SDL_BUTTON_MIDDLE: {
-													  //printf("middle click down\n");
+													  printf("middle click down\n");
 													  send.button = 2;
 													  SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 													  break;
@@ -370,19 +287,19 @@ if(video_definition != NULL)
 								   send.type = TYPE_MOUSE_UP;
 								   switch(userEvent.button.button) {
 									   case SDL_BUTTON_LEFT: {
-													 //printf("left click released\n");
+													 printf("left click released\n");
 													 send.button = 1;
 													 SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 													 break;
 												 }
 									   case SDL_BUTTON_RIGHT: {
-													  //printf("right click released\n");
+													  printf("right click released\n");
 													  send.button = 3;
 													  SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 													  break;
 												  }
 									   case SDL_BUTTON_MIDDLE: {
-													   //printf("middle click released\n");
+													   printf("middle click released\n");
 													   send.button = 2;
 													   SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 													   break;
@@ -429,6 +346,7 @@ if(video_definition != NULL)
 			int lenght;
 			// Decode video frame
 			int frameFinished;
+			int beforeTime = (unsigned long) time(NULL);
 			lenght = avcodec_decode_video2(pCodecCtx, pFrame, &frameFinished, &packet);
 
 
@@ -437,6 +355,7 @@ if(video_definition != NULL)
 			}
 			// Did we get a video frame?
 			if(frameFinished) {
+			printf(" decode time : %lu \n", beforeTime - (unsigned long) time(NULL));
 				AVPicture pict;
 				pict.data[0] = yPlane;
 				pict.data[1] = uPlane;
