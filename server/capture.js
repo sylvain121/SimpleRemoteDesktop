@@ -7,18 +7,16 @@ var timer = null;
 var running = false;
 
 var options = {
-    screen: {
-        width: 0,
-        height: 0,
-        bpp: 0
-    },
-    distant: {
-        width: 0,
-        height: 0
-    },
-    fps: 25
-}
+    inputWidth: 0,
+    inputHeight: 0,
+    outputWidth: 0,
+    outputHeight: 0,
+    bit_rate: 10000000,
+    fps: 60,
+    sample: encoder.YUV_420P
+};
 
+module.exports.free = free;
 
 function free() {
     var x11ModuleName = require.resolve("node-x11");
@@ -31,8 +29,8 @@ function free() {
 
 module.exports.start = function(distantWidth, distantHeight) {
 
-    options.distant.width = distantWidth;
-    options.distant.height = distantHeight;
+    options.outputWidth = distantWidth;
+    options.outputHeight = distantHeight;
     timer = setInterval(getFrame, 1000 / options.fps);
 }
 
@@ -56,14 +54,13 @@ function getFrame() {
     }
     var img = x11.getImage();
     var getImageTime = new Date();
-    options.screen.width = img.width;
-    options.screen.height = img.height;
-    options.screen.bpp = img.bits_per_pixel;
+    options.inputWidth = img.width;
+    options.inputHeight = img.height;
 
     if (!running) {
-        setMouseDistantScreenSize(options.distant.width, options.distant.height);
-        console.log("init with parameters : ", options.screen.width, options.screen.height, options.distant.width, options.distant.height, options.screen.bpp);
-        encoder.initSync(options.screen.width, options.screen.height, options.distant.width, options.distant.height, options.screen.bpp);
+        setMouseDistantScreenSize(options.outputWidth, options.outputHeight);
+        console.log("init with parameters : ", options.inputWidth, options.inputHeight, options.outputWidth, options.outputHeight);
+        encoder.initSync(options);
         running = true;
     }
 
@@ -71,7 +68,7 @@ function getFrame() {
     if (frame !== undefined) {
         socket.getSocket().write(frame);
         var frameTime = new Date();
-        console.log("getImage Time:", getImageTime - initTime, "encoder time : ", frameTime - getImageTime, "global send time : ", frameTime - initTime);
+        //console.log("getImage Time:", getImageTime - initTime, "encoder time : ", frameTime - getImageTime, "global send time : ", frameTime - initTime);
     }
 }
 
@@ -93,8 +90,8 @@ module.exports.isConfigured = function() {
 }
 
 function setMouseDistantScreenSize(width, height) {
-    x_ratio = options.screen.width / width;
-    y_ratio = options.screen.height / height;
+    x_ratio = options.inputWidth / width;
+    y_ratio = options.inputHeight / height;
 
 
 
@@ -102,7 +99,6 @@ function setMouseDistantScreenSize(width, height) {
 
 module.exports.mouseMove = function(x, y) {
     if (running) {
-        console.log(x, x_ratio, y, y_ratio)
         x11.mouseMove(x * x_ratio, y * y_ratio);
     };
 }
@@ -132,7 +128,6 @@ module.exports.mouseToggle = function(button, newStat) {
 
 module.exports.toggleKeyDown = function(keyCode) {
     if (running) {
-        console.log("keycode", "down", keyCode, typeof keyCode);
         if (keyCode <= 0) return console.log("unknow keyCode : " + keyCode);
         x11.keyPressWithKeysym(SDLKey.SDLKeyToKeySym(keyCode), true);
     };

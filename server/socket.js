@@ -46,6 +46,10 @@ var server = net.createServer(function(socket) {
         .on('data', function(data) {
             console.log("new tcp message");
             messageHandler(data);
+        })
+        .on('error', function() {
+            disconnectHander();
+            console.log("error on socket");
         });
 
 
@@ -58,8 +62,7 @@ server.listen(port, function() {
 });
 
 function messageHandler(data) {
-    console.log("buffer size : " + buffer.length);
-    console.log("input data size: " + data.length);
+
     buffer = Buffer.concat([buffer, data]);
 
     while (buffer.length >= 32) {

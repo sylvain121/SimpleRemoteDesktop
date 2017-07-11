@@ -1,26 +1,4 @@
 var capture = require('./capture');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 var socket = require('./socket');
 
 
@@ -33,14 +11,11 @@ socket.registerdisconnectHander(capture.free);
 
 function onNewMessage(message) {
 
-    console.log(message.type);
     switch (message.type) {
         case 1:
-            console.log("keydown : " + message.keycode);
             capture.toggleKeyDown(message.keycode);
             break;
         case 2:
-            console.log("keyup : " + message.keycode);
             capture.toggleKeyUp(message.keycode);
             break;
         case 3:
@@ -53,14 +28,12 @@ function onNewMessage(message) {
             capture.mouseToggle(message.button);
             break;
         case 6:
-            console.log("encoder start, width : " + message.width + ", height: " + message.height);
             capture.start(message.width, message.height);
             break;
         case 7:
             capture.stop();
             break;
         default:
-            console.log(message);
             break;
     }
 
