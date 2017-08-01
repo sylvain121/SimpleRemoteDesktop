@@ -1,3 +1,6 @@
 client/client
 server/node_modules/
 .vscode
+android/.idea/
+android/gen/
+android/out/
