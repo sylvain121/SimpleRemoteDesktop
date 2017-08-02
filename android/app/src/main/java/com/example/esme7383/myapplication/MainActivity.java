@@ -33,10 +33,11 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        if (displayThread == null) {
+        /*if (displayThread == null) {
             displayThread = new DisplayThread(holder.getSurface());
             displayThread.start();
-        }
+        }*/
+        //TODO uncomment when listener are ok
     }
 
     @Override
@@ -47,7 +48,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     private class DisplayThread extends Thread {
         private MediaCodec codec;
         private Surface surface;
-        private Receiver m_renderSock;
+        private DataManager m_renderSock;
 
 
         public DisplayThread(Surface surface) {
@@ -56,7 +57,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
         @Override
         public void run() {
-            m_renderSock = new Receiver();
+            m_renderSock = new DataManager();
 
             //Configuring Media Decoder
             try {
