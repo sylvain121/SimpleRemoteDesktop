@@ -41,17 +41,16 @@ class UserEventListener {
                     case MotionEvent.ACTION_DOWN:
                         //send mouse button : 1 left, 2 right , 3 both, 4 middle
                         //TODO send
-                        break;
                     case MotionEvent.ACTION_UP:
                         //send mouse button : 1 left, 2 right , 3 both, 4 middle
                         //TODO send
-                        break;
                     case MotionEvent.ACTION_MOVE:
-                        int current = event.getButtonState() & previousButtonState;
-                        previousButtonState = event.getButtonState();
+                        boolean left = (event.getButtonState() & leftMask) == leftMask;
+                        boolean right =(event.getButtonState() & rightMask) == rightMask;
 
+                    Log.d(TAG, "left : "+left+" right : "+right);
                 }
-
+/*
                 if(event.getAction() == MotionEvent.ACTION_DOWN) {
 
                    Log.d(TAG, "BUTTON DOWN : "+event.getButtonState()+" "+event.getActionMasked());
@@ -63,7 +62,7 @@ class UserEventListener {
                 } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
 
                 }
-
+ */
                 return false;
             }
         });
