@@ -91,7 +91,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             int codec_height = 720;
 
             m_renderSock = DataManager.getInstance();
-            m_renderSock.connect("192.168.204.173", 8001);
+            m_renderSock.connect("192.168.1.254", 8001);
             m_renderSock.sendStartStream(1920, 1200, 60,codec_width, codec_height,10000000);
 
             //Configuring Media Decoder
