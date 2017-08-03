@@ -62,11 +62,10 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        /*if (displayThread == null) {
+        if (displayThread == null) {
             displayThread = new DisplayThread(holder.getSurface());
             displayThread.start();
-        }*/
-        //TODO uncomment when listener are ok
+        }
     }
 
     @Override
@@ -86,8 +85,14 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
         @Override
         public void run() {
+            /* create temporary variable */
+
+            int codec_width = 1280;
+            int codec_height = 720;
+
             m_renderSock = DataManager.getInstance();
-            m_renderSock.connect("192.168.204.84", 8001);
+            m_renderSock.connect("192.168.204.173", 8001);
+            m_renderSock.sendStartStream(1920, 1200, 60,codec_width, codec_height,10000000);
 
             //Configuring Media Decoder
             try {
@@ -96,7 +101,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                 throw new RuntimeException(e.getMessage());
             }
 
-            MediaFormat format = MediaFormat.createVideoFormat("video/avc", 800, 600);
+            MediaFormat format = MediaFormat.createVideoFormat("video/avc", codec_width, codec_height);
 
             codec.configure(format, surface, null, 0);
             codec.start();

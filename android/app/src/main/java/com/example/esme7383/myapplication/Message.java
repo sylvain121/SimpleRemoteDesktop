@@ -1,6 +1,7 @@
 package com.example.esme7383.myapplication;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Created by user on 7/31/17.
@@ -87,7 +88,9 @@ public class Message {
     }
 
     public byte[] toBytes() {
-        ByteBuffer bb = ByteBuffer.allocate(32);
+
+        ByteBuffer bb = ByteBuffer.allocate(44);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
         bb.putInt(type);
         bb.putInt(x);
         bb.putInt(y);
@@ -101,5 +104,33 @@ public class Message {
         bb.putInt(fps);
 
         return bb.array();
+    }
+
+    public static Message mouseMove(int x, int y) {
+        Message message = new Message();
+        message.type = TYPE_MOUSE_MOTION;
+        message.x = x;
+        message.y = y;
+
+        return message;
+    }
+
+    public static Message mouseButtonDown(String buttonName) {
+        Message message = new Message();
+        message.type = TYPE_MOUSE_DOWN;
+        if(buttonName.equals("left")) message.button = 1;
+        if(buttonName.equals("right")) message.button = 2;
+
+        return message;
+
+    }
+
+    public static Message mouseButtonUp(String buttonName) {
+        Message message = new Message();
+        message.type = TYPE_MOUSE_UP;
+        if(buttonName.equals("left")) message.button = 1;
+        if(buttonName.equals("right")) message.button = 2;
+
+        return message;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.esme7383.myapplication;
 
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -53,12 +54,12 @@ class UserEventManager {
         int y = Math.round(fy);
 
         Log.d(TAG, "X : "+x+" Y : "+y);
-        //TODO send
+        DataManager.getInstance().sendMouseMotion(x, y);
     }
 
     private void sendMouseButtonUpdate(String buttonName, boolean isPressed) {
         Log.d(TAG, "send mouse button update "+buttonName+": "+isPressed);
-        //TODO send
+        DataManager.getInstance().sendMouseButton(buttonName, isPressed);
     }
 
     private boolean isMouseButtonStateChange(boolean mouseButton, Boolean previousMouseButtonState) {
