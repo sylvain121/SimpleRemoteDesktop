@@ -3,6 +3,7 @@ const encoder = require('node-avcodec-h264-encoder');
 const socket = require("./socket");
 const SDLKey = require('./SDLKeysymToX11Keysym');
 
+var lb = Buffer.allocUnsafe(4);
 var timer = null;
 var running = false;
 
@@ -74,10 +75,18 @@ function getFrame() {
 
     var frame = encoder.encodeFrameSync(img.data);
     if (frame !== undefined) {
-        if (socket.getSocket() == null) free();
+        if (socket.getSocket() == null){
+ free(); }
+	else {
+
+	//TODO android patch 
+	lb.writeInt32LE(frame.length);
+	socket.getSocket().write(lb);	
+
         socket.getSocket().write(frame);
         var frameTime = new Date();
         //console.log("getImage Time:", getImageTime - initTime, "encoder time : ", frameTime - getImageTime, "global send time : ", frameTime - initTime);
+}
     }
 }
 
