@@ -5,9 +5,13 @@ import android.content.pm.ActivityInfo;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -15,15 +19,40 @@ import java.util.Arrays;
 
 public class MainActivity extends Activity implements SurfaceHolder.Callback {
     private DisplayThread displayThread = null;
+    private UserEventManager userEventManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE);
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         SurfaceView sv = new SurfaceView(this);
         sv.getHolder().addCallback(this);
-        new UserEventListener(sv);
+        userEventManager = new UserEventManager();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(sv);
+        sv.setOnGenericMotionListener(new View.OnGenericMotionListener() {
+            @Override
+            public boolean onGenericMotion(View v, MotionEvent event) {
+                return userEventManager.genericMouseHandler(event);
+
+            }
+        });
+
+        sv.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return userEventManager.genericMouseHandler(event);
+            }
+        });
     }
 
     @Override
@@ -57,7 +86,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
         @Override
         public void run() {
-            m_renderSock = new DataManager();
+            m_renderSock = DataManager.getInstance();
+            m_renderSock.connect("192.168.204.84", 8001);
 
             //Configuring Media Decoder
             try {

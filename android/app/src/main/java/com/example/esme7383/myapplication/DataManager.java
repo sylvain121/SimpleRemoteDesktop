@@ -18,16 +18,16 @@ import java.net.UnknownHostException;
 
 
 public class DataManager {
+    private static DataManager instance = null;
     private LittleEndianDataInputStream dis;
     private Socket socket;
 
 
-    public DataManager() {
-        //TODO do singleton
+    public void connect(String hostname , int port) {
         try {
-            InetAddress ip = InetAddress.getByName("192.168.204.84");
-            Log.v("DataManager", "Connecting to socket");
-             socket = new Socket(ip, 8001);
+            InetAddress ip = InetAddress.getByName(hostname);
+            Log.v("DataManager", "Connecting to socket" + hostname+":"+port);
+            socket = new Socket(ip, port);
 
             OutputStream outpout = socket.getOutputStream();
             dis = new LittleEndianDataInputStream(socket.getInputStream());
@@ -39,9 +39,20 @@ public class DataManager {
         }
     }
 
+    private DataManager() {
+
+    }
+
     private void startStequence() {
 
 
+    }
+
+    public static DataManager getInstance() {
+        if(instance == null) {
+            instance = new DataManager();
+        }
+        return instance;
     }
 
     public byte[] receive() {
