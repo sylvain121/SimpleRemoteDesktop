@@ -3,6 +3,7 @@ package com.example.esme7383.myapplication;
 import android.util.Log;
 
 import com.google.common.io.LittleEndianDataInputStream;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -57,16 +58,23 @@ public class DataManager {
     public byte[] receive() {
 
         try {
+            while(dis.available() < 4 ) {
+                Thread.sleep(1);
+            }
             int frameLenght = dis.readInt();
             Log.v("DataManager", "frame length : "+frameLenght);
             byte[] frame = new byte[frameLenght];
-
+            while(dis.available() < frameLenght ) {
+                Thread.sleep(1);
+            }
 
             dis.readFully(frame);
             //bytesToHex(frame, 10);
             return frame;
 
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 

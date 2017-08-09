@@ -27,6 +27,14 @@ function free() {
 
     delete require.cache[x11ModuleName];
     delete require.cache[encoderModuleName];
+    try {
+        clearInterval(timer);
+    } catch (e) {
+        console.error(e);
+    }
+
+    running = false;
+
 }
 
 
@@ -82,7 +90,7 @@ function getFrame() {
 	//TODO android patch 
 	lb.writeInt32LE(frame.length);
 	socket.getSocket().write(lb);	
-
+	console.log(frame.length);
         socket.getSocket().write(frame);
         var frameTime = new Date();
         //console.log("getImage Time:", getImageTime - initTime, "encoder time : ", frameTime - getImageTime, "global send time : ", frameTime - initTime);
