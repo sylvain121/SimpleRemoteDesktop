@@ -24,25 +24,24 @@ class UserEventManager {
 
     public boolean genericMouseHandler(MotionEvent event) {
         boolean left = (event.getButtonState() & leftMask) == leftMask;
-        boolean right =(event.getButtonState() & rightMask) == rightMask;
+        boolean right = (event.getButtonState() & rightMask) == rightMask;
 
-        switch(event.getAction()) {
+        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_HOVER_MOVE:
             case MotionEvent.ACTION_MOVE:
-                Log.d(TAG, "left : "+left+" right : "+right);
+                Log.d(TAG, "left : " + left + " right : " + right);
 
-                if(isMouseButtonStateChange(left, preLeft)){
+                if (isMouseButtonStateChange(left, preLeft)) {
                     preLeft = left;
                     sendMouseButtonUpdate("left", left);
-                }
-                if(isMouseButtonStateChange(right, prevRight)) {
+                } else if (isMouseButtonStateChange(right, prevRight)) {
                     prevRight = right;
                     sendMouseButtonUpdate("right", right);
+                } else {
+                    sendMousePosition(event.getX(), event.getY());
                 }
-
-                sendMousePosition(event.getX(), event.getY());
                 break;
         }
 
@@ -53,17 +52,30 @@ class UserEventManager {
         int x = Math.round(fx);
         int y = Math.round(fy);
 
-        Log.d(TAG, "X : "+x+" Y : "+y);
+        Log.d(TAG, "X : " + x + " Y : " + y);
         DataManager.getInstance().sendMouseMotion(x, y);
     }
 
     private void sendMouseButtonUpdate(String buttonName, boolean isPressed) {
-        Log.d(TAG, "send mouse button update "+buttonName+": "+isPressed);
+        Log.d(TAG, "send mouse button update " + buttonName + ": " + isPressed);
         DataManager.getInstance().sendMouseButton(buttonName, isPressed);
     }
 
     private boolean isMouseButtonStateChange(boolean mouseButton, Boolean previousMouseButtonState) {
-        if(mouseButton != previousMouseButtonState) return true;
+        if (mouseButton != previousMouseButtonState) return true;
         return false;
+    }
+
+    public boolean onTouchHandler(MotionEvent event) {
+        sendMousePosition(event.getX(), event.getY());
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                sendMouseButtonUpdate("left", true);
+                break;
+            case MotionEvent.ACTION_UP:
+                sendMouseButtonUpdate("left", false);
+                break;
+        }
+        return true;
     }
 }

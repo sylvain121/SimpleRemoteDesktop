@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -20,6 +21,7 @@ import java.util.Arrays;
 public class MainActivity extends Activity implements SurfaceHolder.Callback {
     private DisplayThread displayThread = null;
     private UserEventManager userEventManager;
+    private String TAG = "MAIN ACTIVITY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +52,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         sv.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                return userEventManager.genericMouseHandler(event);
+                return userEventManager.onTouchHandler(event);
             }
         });
     }
@@ -62,8 +64,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        Log.d(TAG, "width : "+width+ "height : "+height);
         if (displayThread == null) {
-            displayThread = new DisplayThread(holder.getSurface());
+            displayThread = new DisplayThread(holder.getSurface(), width, height);
             displayThread.start();
         }
     }
@@ -76,11 +79,15 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     private class DisplayThread extends Thread {
         private MediaCodec codec;
         private Surface surface;
+        private int width;
+        private int height;
         private DataManager m_renderSock;
 
 
-        public DisplayThread(Surface surface) {
+        public DisplayThread(Surface surface, int width, int height) {
             this.surface = surface;
+            this.width = width;
+            this.height = height;
         }
 
         @Override
@@ -89,10 +96,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
             int codec_width = 1280;
             int codec_height = 720;
+            int bandwidth = 2000000;
+            int fps = 30;
 
             m_renderSock = DataManager.getInstance();
-            m_renderSock.connect("192.168.1.254", 8001);
-            m_renderSock.sendStartStream(1920, 1200, 60,codec_width, codec_height,10000000);
+            m_renderSock.connect("192.168.204.173", 8001);
+            m_renderSock.sendStartStream(this.width, this.height, fps,codec_width, codec_height, bandwidth);
 
             //Configuring Media Decoder
             try {
@@ -106,10 +115,11 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             codec.configure(format, surface, null, 0);
             codec.start();
 
-
             while (!Thread.interrupted()) {
                 int frameSize = 0;
+                long startTime = System.nanoTime();
                 byte[] frameData = m_renderSock.receive();
+                Log.d("VIDEO DECODER THREAD", "get frame time : "+(System.nanoTime() - startTime) /1000000);
 
                 //if (frameData.length == 1) // Just for the moment, to cope with the first pakets get lost because of missing ARP, see http://stackoverflow.com/questions/11812731/first-udp-message-to-a-specific-remote-ip-gets-lost
                   //  continue;
