@@ -81,7 +81,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         private Surface surface;
         private int width;
         private int height;
-        private DataManager m_renderSock;
+        private DataManagerCHannel m_renderSock;
 
 
         public DisplayThread(Surface surface, int width, int height) {
@@ -97,9 +97,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             int codec_width = 1280;
             int codec_height = 720;
             int bandwidth = 2000000;
-            int fps = 30;
+            int fps = 100;
 
-            m_renderSock = DataManager.getInstance();
+            m_renderSock = DataManagerCHannel.getInstance();
             m_renderSock.connect("192.168.204.173", 8001);
             m_renderSock.sendStartStream(this.width, this.height, fps,codec_width, codec_height, bandwidth);
 
@@ -117,9 +117,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
             while (!Thread.interrupted()) {
                 int frameSize = 0;
-                long startTime = System.nanoTime();
+                long startTime = System.currentTimeMillis();
                 byte[] frameData = m_renderSock.receive();
-                Log.d("VIDEO DECODER THREAD", "get frame time : "+(System.nanoTime() - startTime) /1000000);
+                //Log.d("VIDEO DECODER THREAD", "get frame time : "+(System.currentTimeMillis() - startTime));
 
                 //if (frameData.length == 1) // Just for the moment, to cope with the first pakets get lost because of missing ARP, see http://stackoverflow.com/questions/11812731/first-udp-message-to-a-specific-remote-ip-gets-lost
                   //  continue;

@@ -53,12 +53,12 @@ class UserEventManager {
         int y = Math.round(fy);
 
         Log.d(TAG, "X : " + x + " Y : " + y);
-        DataManager.getInstance().sendMouseMotion(x, y);
+        DataManagerCHannel.getInstance().sendMouseMotion(x, y);
     }
 
     private void sendMouseButtonUpdate(String buttonName, boolean isPressed) {
         Log.d(TAG, "send mouse button update " + buttonName + ": " + isPressed);
-        DataManager.getInstance().sendMouseButton(buttonName, isPressed);
+        DataManagerCHannel.getInstance().sendMouseButton(buttonName, isPressed);
     }
 
     private boolean isMouseButtonStateChange(boolean mouseButton, Boolean previousMouseButtonState) {

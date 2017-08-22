@@ -106,6 +106,28 @@ public class Message {
         return bb.array();
     }
 
+    public ByteBuffer toByteBuffer() {
+
+        ByteBuffer bb = ByteBuffer.allocate(44);
+        bb.clear();
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+        bb.putInt(type);
+        bb.putInt(x);
+        bb.putInt(y);
+        bb.putInt(button);
+        bb.putInt(keyCode);
+        bb.putInt(width);
+        bb.putInt(height);
+        bb.putInt(codec_width);
+        bb.putInt(codec_height);
+        bb.putInt(bandwidth);
+        bb.putInt(fps);
+
+        bb.flip();
+
+        return bb;
+    }
+
     public static Message mouseMove(int x, int y) {
         Message message = new Message();
         message.type = TYPE_MOUSE_MOTION;

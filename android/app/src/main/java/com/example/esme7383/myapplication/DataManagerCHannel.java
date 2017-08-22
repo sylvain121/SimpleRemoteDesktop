@@ -2,17 +2,16 @@ package com.example.esme7383.myapplication;
 
 import android.util.Log;
 
-import com.google.common.io.LittleEndianDataInputStream;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.channels.ByteChannel;
+import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
 
@@ -21,32 +20,33 @@ import java.util.Arrays;
  */
 
 
-public class DataManager {
-    private static DataManager instance = null;
-    private DataInputStream dis;
-    private Socket socket;
-    private OutputStream outpout;
+public class DataManagerCHannel {
+    private static DataManagerCHannel instance = null;
+    private static ByteBuffer buf = ByteBuffer.allocate(512*1024);
     byte[] net_in = new byte[0];
-    private byte[] frame =new byte[0];
     private boolean isFirstNal = true;
-    public static final String TAG = "DATAMANAGER";
+    public static final String TAG = "DATAMANAGER CHANNEL";
+    private SocketChannel chan;
+    private byte[] frame;
+    private OutputStream output;
 
 
     public void connect(String hostname , int port) {
         try {
-            InetAddress ip = InetAddress.getByName(hostname);
-            Log.v("DataManager", "Connecting to socket" + hostname+":"+port);
-            socket = new Socket(ip, port);
 
-            outpout = socket.getOutputStream();
-            dis = new DataInputStream(new BufferedInputStream(socket.getInputStream(),8192));
+            Log.v("DataManager", "Connecting to socket" + hostname+":"+port);
+            final InetSocketAddress socketAddr = new InetSocketAddress(hostname, port);
+            chan = SocketChannel.open();
+            chan.connect(socketAddr);
+            output = chan.socket().getOutputStream();
+            buf.limit (0);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private DataManager() {
+    private DataManagerCHannel() {
 
     }
 
@@ -55,9 +55,9 @@ public class DataManager {
 
     }
 
-    public static DataManager getInstance() {
+    public static DataManagerCHannel getInstance() {
         if(instance == null) {
-            instance = new DataManager();
+            instance = new DataManagerCHannel();
         }
         return instance;
     }
@@ -65,21 +65,41 @@ public class DataManager {
     public byte[] receive() {
 
         try {
-            long headerTime = System.currentTimeMillis();
-            int frameLength = dis.readInt();
-            Log.d("TCP DATA", "get header time : "+(System.currentTimeMillis() - headerTime));
-            frame = new byte[frameLength];
-            dis.readFully(frame);
+            long startTime = System.currentTimeMillis();
+            ensure(4, chan);
+            Log.d("VIDEO DECODER THREAD", "get body time : "+(System.currentTimeMillis() - startTime));
+            int len = buf.getInt();
+            ensure(len, chan);
+            frame = new byte[len];
+            buf.get(frame, 0, len);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return frame;
     }
 
+    private static void ensure (int len, ByteChannel chan) throws IOException
+    {
+        int test = buf.remaining();
+        if (buf.remaining () < len) {
+            buf.compact ();
+            buf.flip ();
+            do {
+                buf.position (buf.limit ());
+                buf.limit (buf.capacity ());
+                chan.read (buf);
+                buf.flip ();
+            } while (buf.remaining() < len);
+        }
+    }
+
+
     public void sendStartStream(int width, int height, int fps, int codec_width, int codec_height, int bandwidth) {
         try {
-            outpout.write(Message.startStream(width, height, fps, codec_width, codec_height, bandwidth).toBytes());
-            outpout.flush();
+            output.write(Message.startStream(width, height, fps, codec_width, codec_height, bandwidth).toBytes());
+            output.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -88,8 +108,8 @@ public class DataManager {
 
     public void sendMouseMotion(int x, int y) {
         try {
-            outpout.write(Message.mouseMove(x, y).toBytes());
-            outpout.flush();
+            output.write(Message.mouseMove(x, y).toBytes());
+            output.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -98,15 +118,15 @@ public class DataManager {
     public void sendMouseButton(String buttonName, boolean isPressed) {
         if(isPressed) {
             try {
-                outpout.write(Message.mouseButtonDown(buttonName).toBytes());
-                outpout.flush();
+                output.write(Message.mouseButtonDown(buttonName).toBytes());
+                output.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                outpout.write(Message.mouseButtonUp(buttonName).toBytes());
-                outpout.flush();
+                output.write(Message.mouseButtonUp(buttonName).toBytes());
+                output.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
