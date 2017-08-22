@@ -7,11 +7,7 @@ var lb = Buffer.allocUnsafe(4);
 var timer = null;
 var running = false;
 
-
-var latency = {
-    capture: [],
-    encode: []
-}
+var frameSend = true;
 
 var options = {
     inputWidth: 0,
@@ -53,20 +49,6 @@ module.exports.start = function(distantWidth, distantHeight, codecWidth, codecHe
     options.bit_rate = bandwidth;
     options.fps = fps;
     timer = setInterval(getFrame, 1000 / options.fps);
-
-    latencyTimer = setInterval(displayCurrentLatency, 1000);
-}
-
-
-function displayCurrentLatency() {
-    var capLat = latency.capture / latency.capture.length;
-    var encLat = latency.encode / latency.encode.length;
-    console.log("desktop capture latency : " + capLat + " encoder latency : " + encLat + " global latency : " + (capLat + encLat));
-
-    var latency = {
-        capture: [],
-        encode: []
-    }
 }
 
 module.exports.stop = function() {
@@ -102,21 +84,18 @@ function getFrame() {
     }
 
     if (frameSend) {
-        frameSend = false;
         var frame = encoder.encodeFrameSync(img.data);
 
         if (frame !== undefined) {
-
+        	frameSend = false;
             var frameTime = new Date();
-            latency.capture.push(getImageTime - initTime);
-            latency.encode.push(frameTime - getImageTime);
 
             if (socket.getSocket() == null) {
                 free();
             } else {
 
                 //TODO android patch 
-                lb.writeInt32LE(frame.length);
+		lb.writeInt32BE(frame.length);
                 socket.getSocket().write(lb, function() {
                     console.log(frame.length);
                     socket.getSocket().write(frame, function() {
