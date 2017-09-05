@@ -1,17 +1,18 @@
-package com.example.esme7383.myapplication;
+package com.example.esme7383.myapplication.discovery;
 
 import android.util.Log;
 
+import com.example.esme7383.myapplication.MainActivity;
+
 import java.io.IOException;
 import java.net.*;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 public class DiscoveryListenerService implements Runnable {
 
     private final int port;
     private final MainActivity activity;
+    private DatagramSocket serverSocket;
 
     public DiscoveryListenerService(MainActivity mainActivity, int port) {
         this.port = port;
@@ -21,14 +22,14 @@ public class DiscoveryListenerService implements Runnable {
     @Override
     public void run() {
         try {
-            DatagramSocket serverSocket = new DatagramSocket(port);
+            serverSocket = new DatagramSocket(port);
             byte[] receiveData = new byte[20]; //TOdO how to fix length ? same on server ?
 
-            Log.d("DISCOVERY", "Listening on udp:"+InetAddress.getLocalHost().getHostAddress()+":port");
+            Log.d("DISCOVERY", "Listening on udp : "+InetAddress.getLocalHost().getHostAddress()+":port");
             DatagramPacket receivePacket = new DatagramPacket(receiveData,
                     receiveData.length);
 
-            while(true)
+            while(!Thread.interrupted())
             {
                 serverSocket.receive(receivePacket);
                 String sentence = new String( receivePacket.getData(), 0,
@@ -67,4 +68,7 @@ public class DiscoveryListenerService implements Runnable {
     }
 
 
+    public void close() {
+        serverSocket.close();
+    }
 }

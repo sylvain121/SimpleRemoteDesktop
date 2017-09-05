@@ -1,4 +1,4 @@
-package com.example.esme7383.myapplication;
+package com.example.esme7383.myapplication.player;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

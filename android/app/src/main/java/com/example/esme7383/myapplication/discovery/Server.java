@@ -1,4 +1,4 @@
-package com.example.esme7383.myapplication;
+package com.example.esme7383.myapplication.discovery;
 
 import java.net.InetAddress;
 

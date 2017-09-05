@@ -1,6 +1,8 @@
-package com.example.esme7383.myapplication;
+package com.example.esme7383.myapplication.player.video;
 
 import android.util.Log;
+
+import com.example.esme7383.myapplication.player.Message;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,8 +18,8 @@ import java.util.Arrays;
  */
 
 
-public class DataManagerCHannelWithNALparser {
-    private static DataManagerCHannelWithNALparser instance = null;
+public class DataManagerChannel {
+    private static DataManagerChannel instance = null;
     private static ByteBuffer buf = ByteBuffer.allocate(512*1024);
     byte[] net_in = new byte[0];
     private boolean isFirstNal = true;
@@ -42,7 +44,7 @@ public class DataManagerCHannelWithNALparser {
         }
     }
 
-    private DataManagerCHannelWithNALparser() {
+    private DataManagerChannel() {
 
     }
 
@@ -51,9 +53,9 @@ public class DataManagerCHannelWithNALparser {
 
     }
 
-    public static DataManagerCHannelWithNALparser getInstance() {
+    public static DataManagerChannel getInstance() {
         if(instance == null) {
-            instance = new DataManagerCHannelWithNALparser();
+            instance = new DataManagerChannel();
         }
         return instance;
     }
@@ -64,10 +66,12 @@ public class DataManagerCHannelWithNALparser {
             long startTime = System.currentTimeMillis();
             ensure(4, chan);
             Log.d("VIDEO DECODER THREAD", "get body time : "+(System.currentTimeMillis() - startTime));
-            int len = buf.getInt();
-            ensure(len, chan);
-            frame = new byte[len];
-            buf.get(frame, 0, len);
+            if (chan.isConnected()) {
+                int len = buf.getInt();
+                ensure(len, chan);
+                frame = new byte[len];
+                buf.get(frame, 0, len);
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -176,5 +180,13 @@ public class DataManagerCHannelWithNALparser {
         System.arraycopy(net_in, 0, net_temp, 0, net_in.length);
         System.arraycopy(dataAvaibleLength, 0, net_temp,net_in.length, dataAvaibleLength.length);
         net_in = net_temp;
+    }
+
+    public void closeChannel() {
+        try {
+            chan.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

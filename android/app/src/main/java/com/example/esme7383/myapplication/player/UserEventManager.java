@@ -1,11 +1,9 @@
-package com.example.esme7383.myapplication;
+package com.example.esme7383.myapplication.player;
 
-import android.provider.ContactsContract;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.SurfaceView;
-import android.view.View;
+
+import com.example.esme7383.myapplication.player.video.DataManagerChannel;
 
 /**
  * Created by ESME7383 on 02/08/2017.
@@ -53,12 +51,12 @@ class UserEventManager {
         int y = Math.round(fy);
 
         Log.d(TAG, "X : " + x + " Y : " + y);
-        DataManagerCHannel.getInstance().sendMouseMotion(x, y);
+        DataManagerChannel.getInstance().sendMouseMotion(x, y);
     }
 
     private void sendMouseButtonUpdate(String buttonName, boolean isPressed) {
         Log.d(TAG, "send mouse button update " + buttonName + ": " + isPressed);
-        DataManagerCHannel.getInstance().sendMouseButton(buttonName, isPressed);
+        DataManagerChannel.getInstance().sendMouseButton(buttonName, isPressed);
     }
 
     private boolean isMouseButtonStateChange(boolean mouseButton, Boolean previousMouseButtonState) {
