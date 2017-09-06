@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 public class DataManagerChannel {
     private static DataManagerChannel instance = null;
-    private static ByteBuffer buf = ByteBuffer.allocate(512*1024);
+    private static ByteBuffer buf = null;
     byte[] net_in = new byte[0];
     private boolean isFirstNal = true;
     public static final String TAG = "DATAMANAGER CHANNEL";
@@ -37,6 +37,7 @@ public class DataManagerChannel {
             chan = SocketChannel.open();
             chan.connect(socketAddr);
             output = chan.socket().getOutputStream();
+            buf = ByteBuffer.allocate(512*1024);
             buf.limit (0);
 
         } catch (IOException e) {
@@ -63,14 +64,18 @@ public class DataManagerChannel {
     public byte[] receive() {
 
         try {
-            long startTime = System.currentTimeMillis();
-            ensure(4, chan);
-            Log.d("VIDEO DECODER THREAD", "get body time : "+(System.currentTimeMillis() - startTime));
+
             if (chan.isConnected()) {
+                //long startTime = System.currentTimeMillis();
+                ensure(4, chan);
+                //Log.d("VIDEO DECODER THREAD", "get body time : "+(System.currentTimeMillis() - startTime));
                 int len = buf.getInt();
                 ensure(len, chan);
                 frame = new byte[len];
                 buf.get(frame, 0, len);
+            } else {
+                Log.d("VIDEO DECODER THREAD","Socket not connected reconnect");
+
             }
 
         } catch (IOException e) {

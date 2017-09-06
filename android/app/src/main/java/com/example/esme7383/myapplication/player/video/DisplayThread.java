@@ -26,6 +26,7 @@ public class DisplayThread extends Thread {
 
     private int codec_width = 1280;
     private int codec_height = 720;
+    private boolean decoderStoped = false;
 
 
     public DisplayThread(Surface surface, int width, int height, String ipAddress, SharedPreferences sharedPreference) {
@@ -122,30 +123,32 @@ public class DisplayThread extends Thread {
                 }
             }
             /*Edit end*/
+            if(!decoderStoped) {
 
-            int inIndex = codec.dequeueInputBuffer(10000); // TODO crash on  finish activity
-            if (inIndex >= 0) {
-                ByteBuffer inputBuffer = codec.getInputBuffer(inIndex);
-                inputBuffer.clear();
-                //inputBuffer.put(data);
-                inputBuffer.put(frameData);
-                //codec.queueInputBuffer(inIndex, 0, data.length, 16, 0);
-                codec.queueInputBuffer(inIndex, 0, frameData.length, 16, 0);
-            }
+                int inIndex = codec.dequeueInputBuffer(10000); // TODO crash on  finish activity
+                if (inIndex >= 0) {
+                    ByteBuffer inputBuffer = codec.getInputBuffer(inIndex);
+                    inputBuffer.clear();
+                    //inputBuffer.put(data);
+                    inputBuffer.put(frameData);
+                    //codec.queueInputBuffer(inIndex, 0, data.length, 16, 0);
+                    codec.queueInputBuffer(inIndex, 0, frameData.length, 16, 0);
+                }
 
-            MediaCodec.BufferInfo buffInfo = new MediaCodec.BufferInfo();
-            int outIndex = codec.dequeueOutputBuffer(buffInfo, 10000);
+                MediaCodec.BufferInfo buffInfo = new MediaCodec.BufferInfo();
+                int outIndex = codec.dequeueOutputBuffer(buffInfo, 10000);
 
-            switch (outIndex) {
-                case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
-                    break;
-                case MediaCodec.INFO_TRY_AGAIN_LATER:
-                    break;
-                case -3: //This solves it
-                    break;
-                default:
-                    ByteBuffer buffer = codec.getOutputBuffer(outIndex);
-                    codec.releaseOutputBuffer(outIndex, true);
+                switch (outIndex) {
+                    case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+                        break;
+                    case MediaCodec.INFO_TRY_AGAIN_LATER:
+                        break;
+                    case -3: //This solves it
+                        break;
+                    default:
+                        ByteBuffer buffer = codec.getOutputBuffer(outIndex);
+                        codec.releaseOutputBuffer(outIndex, true);
+                }
             }
 
 
@@ -155,6 +158,8 @@ public class DisplayThread extends Thread {
     }
 
     public void close() {
+        Log.d(TAG, "Closing display thread");
+        this.decoderStoped = true;
         codec.release();
         m_renderSock.closeChannel();
         interrupt();

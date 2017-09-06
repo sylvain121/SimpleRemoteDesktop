@@ -85,6 +85,7 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         Log.d("SURFACE", "SURFACE DESTROYED");
+        displayThread.close();
     }
 
 
