@@ -24,6 +24,7 @@ var options = {
 module.exports.free = free;
 
 function free() {
+    console.log("FREEing CAPTURE");
     var x11ModuleName = require.resolve("node-x11");
     var encoderModuleName = require.resolve('node-avcodec-h264-encoder');
 
@@ -35,13 +36,16 @@ function free() {
         console.error(e);
     }
 
+    frameSend  = true;
     running = false;
 
 }
 
 
+module.exports.free = free;
 module.exports.start = function(distantWidth, distantHeight, codecWidth, codecHeight, bandwidth, fps) {
 
+    console.log("Starting new capture session");
     options.outputWidth = codecWidth;
     options.outputHeight = codecHeight;
     options.distantDisplayWidth = distantWidth;
@@ -59,10 +63,12 @@ module.exports.stop = function() {
     }
 
     running = false;
+    frameSend  = true;
 }
 
 
 function getFrame() {
+   console.log("INTERVAL"); 
     var initTime = new Date();
     if (!running) {
         x11.init();
@@ -84,6 +90,7 @@ function getFrame() {
     }
 
     if (frameSend) {
+console.log("TIG");
         var frame = encoder.encodeFrameSync(img.data);
 
         if (frame !== undefined) {
@@ -97,7 +104,6 @@ function getFrame() {
                 //TODO android patch 
 		lb.writeInt32BE(frame.length);
                 socket.getSocket().write(lb, function() {
-                    console.log(frame.length);
                     socket.getSocket().write(frame, function() {
                         frameSend = true;
                     });
