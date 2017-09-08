@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.hardware.input.InputManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -17,11 +20,12 @@ import com.example.esme7383.myapplication.MainActivity;
 import com.example.esme7383.myapplication.player.video.DisplayThread;
 import com.example.esme7383.myapplication.settings.SettingsActivity;
 
-public class PlayerActivity extends Activity implements SurfaceHolder.Callback {
+public class PlayerActivity extends Activity implements SurfaceHolder.Callback, InputManager.InputDeviceListener {
     private DisplayThread displayThread = null;
     private UserEventManager userEventManager;
     private String TAG = "PLAYER ACTIVITY";
     private String IPAddress;
+    private boolean MouseIsPresent = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +49,7 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback {
         sv.setOnGenericMotionListener(new View.OnGenericMotionListener() {
             @Override
             public boolean onGenericMotion(View v, MotionEvent event) {
+                Log.d(TAG, "event : "+event.getButtonState());
                 return userEventManager.genericMouseHandler(event);
 
             }
@@ -53,7 +58,13 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback {
         sv.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                return userEventManager.onTouchHandler(event);
+                Log.d(TAG, "touch event : "+event.getButtonState());
+                if(event.getDevice().getSources() != InputDevice.SOURCE_MOUSE) {
+                    return userEventManager.onTouchHandler(event);
+                } else {
+                    return userEventManager.genericMouseHandler(event);
+                }
+
             }
         });
 
@@ -88,5 +99,30 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback {
         displayThread.close();
     }
 
+    @Override
+    public void onInputDeviceAdded(int deviceId) {
+        InputDevice device = InputDevice.getDevice(deviceId);
+        if(device.getSources() == InputDevice.SOURCE_MOUSE) {
+            Log.d(TAG, "Mouse plugged");
+            this.MouseIsPresent = true;
+        }
+    }
 
+    @Override
+    public void onInputDeviceRemoved(int deviceId) {
+        InputDevice device = InputDevice.getDevice(deviceId);
+        if(device.getSources() == InputDevice.SOURCE_MOUSE) {
+            Log.d(TAG, "Mouse Changed");
+
+        }
+    }
+
+    @Override
+    public void onInputDeviceChanged(int deviceId) {
+        InputDevice device = InputDevice.getDevice(deviceId);
+        if(device.getSources() == InputDevice.SOURCE_MOUSE) {
+            Log.d(TAG, "Mouse Unplugged");
+            this.MouseIsPresent = false;
+        }
+    }
 }

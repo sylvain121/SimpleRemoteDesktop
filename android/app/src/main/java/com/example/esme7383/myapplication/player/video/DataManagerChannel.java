@@ -24,7 +24,7 @@ public class DataManagerChannel {
     byte[] net_in = new byte[0];
     private boolean isFirstNal = true;
     public static final String TAG = "DATAMANAGER CHANNEL";
-    private SocketChannel chan;
+    private SocketChannel chan = null;
     private byte[] frame;
     private OutputStream output;
 
@@ -188,10 +188,12 @@ public class DataManagerChannel {
     }
 
     public void closeChannel() {
-        try {
-            chan.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(chan != null) {
+            try {
+                chan.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

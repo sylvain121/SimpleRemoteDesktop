@@ -21,27 +21,25 @@ class UserEventManager {
 
 
     public boolean genericMouseHandler(MotionEvent event) {
+
         boolean left = (event.getButtonState() & leftMask) == leftMask;
         boolean right = (event.getButtonState() & rightMask) == rightMask;
+        Log.d(TAG, event.getButtonState()+"");
+        Log.d(TAG, event.getAction()+"");
+        Log.d(TAG, "left : " + left + " right : " + right);
 
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_HOVER_MOVE:
-            case MotionEvent.ACTION_MOVE:
-                Log.d(TAG, "left : " + left + " right : " + right);
 
                 if (isMouseButtonStateChange(left, preLeft)) {
+                    Log.d(TAG, "left click change detected");
                     preLeft = left;
                     sendMouseButtonUpdate("left", left);
                 } else if (isMouseButtonStateChange(right, prevRight)) {
                     prevRight = right;
+                    Log.d(TAG, "right click change detected");
                     sendMouseButtonUpdate("right", right);
                 } else {
                     sendMousePosition(event.getX(), event.getY());
                 }
-                break;
-        }
 
         return true;
     }
@@ -65,6 +63,7 @@ class UserEventManager {
     }
 
     public boolean onTouchHandler(MotionEvent event) {
+        Log.d(TAG, "Touch event detected");
         sendMousePosition(event.getX(), event.getY());
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -72,6 +71,19 @@ class UserEventManager {
                 break;
             case MotionEvent.ACTION_UP:
                 sendMouseButtonUpdate("left", false);
+                break;
+        }
+        return true;
+    }
+
+    public boolean onLongTouchHandler(MotionEvent e) {
+        sendMousePosition(e.getX(), e.getY());
+        switch (e.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                sendMouseButtonUpdate("right", true);
+                break;
+            case MotionEvent.ACTION_UP:
+                sendMouseButtonUpdate("right", false);
                 break;
         }
         return true;
