@@ -55,6 +55,7 @@ public class SettingsActivity extends Activity {
         resolutionArray.add("600p");
         resolutionArray.add("720p");
         resolutionArray.add("1080p");
+         //resolutionArray.add("original"); FIXME code height and width passed to decoder ?
 
         ArrayAdapter<String> resolutionAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, resolutionArray);
         resolutionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

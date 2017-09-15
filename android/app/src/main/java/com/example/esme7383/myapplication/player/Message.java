@@ -11,11 +11,22 @@ public class Message {
 
     public static int TYPE_KEY_DOWN = 1;
     public static int TYPE_KEY_UP = 2;
-    public static int TYPE_MOUSE_MOTION= 3;
+    public static int TYPE_MOUSE_MOTION = 3;
     public static int TYPE_MOUSE_DOWN = 4;
-    public static int TYPE_MOUSE_UP= 5;
+    public static int TYPE_MOUSE_UP = 5;
     public static int TYPE_ENCODER_START = 6;
     public static int TYPE_ENCODER_STOP = 7;
+
+    public static final int MOUSE_BUTTON_LEFT = 1;
+    public static final int MOUSE_BUTTON_MIDDLE = 2;
+    public static final int MOUSE_BUTTON_RIGHT = 3;
+    public static final int MOUSE_BUTTON_SCROLL_UP = 4;
+    public static final int MOUSE_BUTTON_SCROLL_DOWN = 5;
+    public static final int MOUSE_BUTTON_SCROLL_LEFT = 6;
+    public static final int MOUSE_BUTTON_SCROLL_RIGHT = 7;
+    public static final int MOUSE_BUTTON_BROWSER_BACKWARD = 8;
+    public static final int MOUSE_BUTTON_BROWSER_FORWARD = 9;
+
 
     private int type = 0;
     private int x = 0;
@@ -140,8 +151,8 @@ public class Message {
     public static Message mouseButtonDown(String buttonName) {
         Message message = new Message();
         message.type = TYPE_MOUSE_DOWN;
-        if(buttonName.equals("left")) message.button = 1;
-        if(buttonName.equals("right")) message.button = 2;
+        if (buttonName.equals("left")) message.button = MOUSE_BUTTON_LEFT;
+        if (buttonName.equals("right")) message.button = MOUSE_BUTTON_RIGHT;
 
         return message;
 
@@ -150,8 +161,8 @@ public class Message {
     public static Message mouseButtonUp(String buttonName) {
         Message message = new Message();
         message.type = TYPE_MOUSE_UP;
-        if(buttonName.equals("left")) message.button = 1;
-        if(buttonName.equals("right")) message.button = 2;
+        if (buttonName.equals("left")) message.button = MOUSE_BUTTON_LEFT;
+        if (buttonName.equals("right")) message.button = MOUSE_BUTTON_RIGHT;
 
         return message;
     }

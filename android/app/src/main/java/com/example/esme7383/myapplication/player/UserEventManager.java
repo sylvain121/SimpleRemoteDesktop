@@ -14,6 +14,9 @@ class UserEventManager {
     public static String TAG = "EVENT LISTENER";
     private int previousButtonState = 0;
 
+
+
+
     private int leftMask = 1;
     private int rightMask = 2;
     private Boolean preLeft = false;
@@ -53,7 +56,7 @@ class UserEventManager {
     }
 
     private void sendMouseButtonUpdate(String buttonName, boolean isPressed) {
-        Log.d(TAG, "send mouse button update " + buttonName + ": " + isPressed);
+        Log.d(TAG, "send mouse button update " + buttonName + " isPressed ?: " + isPressed);
         DataManagerChannel.getInstance().sendMouseButton(buttonName, isPressed);
     }
 

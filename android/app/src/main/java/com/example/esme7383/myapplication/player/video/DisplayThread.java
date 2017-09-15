@@ -50,6 +50,9 @@ public class DisplayThread extends Thread {
                 codec_width = 1920;
                 codec_height = 1080;
                 break;
+            case "original":
+                codec_width = 0;
+                codec_height = 0;
         }
 
 
