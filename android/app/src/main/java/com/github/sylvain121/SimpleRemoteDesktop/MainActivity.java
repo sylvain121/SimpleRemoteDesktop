@@ -1,4 +1,4 @@
-package com.example.esme7383.myapplication;
+package com.github.sylvain121.SimpleRemoteDesktop;
 
 import android.app.ListActivity;
 import android.content.Intent;
@@ -10,11 +10,11 @@ import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.ListView;
 
-import com.example.esme7383.myapplication.discovery.DiscoveryListenerService;
-import com.example.esme7383.myapplication.discovery.Server;
-import com.example.esme7383.myapplication.discovery.ServerAdapter;
-import com.example.esme7383.myapplication.player.PlayerActivity;
-import com.example.esme7383.myapplication.settings.SettingsActivity;
+import com.github.sylvain121.SimpleRemoteDesktop.discovery.DiscoveryListenerService;
+import com.github.sylvain121.SimpleRemoteDesktop.discovery.Server;
+import com.github.sylvain121.SimpleRemoteDesktop.discovery.ServerAdapter;
+import com.github.sylvain121.SimpleRemoteDesktop.player.PlayerActivity;
+import com.github.sylvain121.SimpleRemoteDesktop.settings.SettingsActivity;
 
 import java.util.ArrayList;
 

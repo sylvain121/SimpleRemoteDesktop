@@ -1,4 +1,4 @@
-package com.example.esme7383.myapplication.player;
+package com.github.sylvain121.SimpleRemoteDesktop.player;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,7 +7,6 @@ import android.content.pm.ActivityInfo;
 import android.hardware.input.InputManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -16,16 +15,18 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.example.esme7383.myapplication.MainActivity;
-import com.example.esme7383.myapplication.player.video.DisplayThread;
-import com.example.esme7383.myapplication.settings.SettingsActivity;
+import com.github.sylvain121.SimpleRemoteDesktop.MainActivity;
+import com.github.sylvain121.SimpleRemoteDesktop.player.video.MediaCodecDecoderRenderer;
+import com.github.sylvain121.SimpleRemoteDesktop.settings.SettingsActivity;
 
 public class PlayerActivity extends Activity implements SurfaceHolder.Callback, InputManager.InputDeviceListener {
-    private DisplayThread displayThread = null;
+
     private UserEventManager userEventManager;
     private String TAG = "PLAYER ACTIVITY";
     private String IPAddress;
     private boolean MouseIsPresent = false;
+    private MediaCodecDecoderRenderer mediaCodec;
+    private ConnectionThread cnx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,22 +82,22 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback, 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         Log.d(TAG, "width : "+width+ "height : "+height);
-    if(displayThread != null) {
-           displayThread.close();
-    }
 
         SharedPreferences sharedPreference = getBaseContext().getSharedPreferences(SettingsActivity.SIMPLE_REMOTE_DESKTOP_PREF, 0);
 
+        mediaCodec = new MediaCodecDecoderRenderer();
+        mediaCodec.setRenderTarget(holder);
+        mediaCodec.setup(width, height);
+        mediaCodec.start();
 
-        displayThread = new DisplayThread(holder.getSurface(), width, height, this.IPAddress, sharedPreference);
-            displayThread.start();
-
+        cnx = new ConnectionThread(width, height, this.IPAddress, sharedPreference);
+        cnx.setDecoderHandler(mediaCodec);
+        cnx.start();
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         Log.d("SURFACE", "SURFACE DESTROYED");
-        displayThread.close();
     }
 
     @Override

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.esme7383.myapplication">
+    package="com.github.sylvain121.SimpleRemoteDesktop">
 
     <application
         android:allowBackup="true"
@@ -9,13 +9,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".player.PlayerActivity">
+        <activity android:name="com.github.sylvain121.SimpleRemoteDesktop.player.PlayerActivity">
 
         </activity>
-        <activity android:name=".settings.SettingsActivity">
+        <activity android:name="com.github.sylvain121.SimpleRemoteDesktop.settings.SettingsActivity">
 
         </activity>
-        <activity android:name=".MainActivity"
+        <activity android:name="com.github.sylvain121.SimpleRemoteDesktop.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

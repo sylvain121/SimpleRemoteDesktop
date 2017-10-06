@@ -1,4 +1,4 @@
-package com.example.esme7383.myapplication.discovery;
+package com.github.sylvain121.SimpleRemoteDesktop.discovery;
 
 import java.net.InetAddress;
 

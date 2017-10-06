@@ -1,8 +1,8 @@
-package com.example.esme7383.myapplication.player.video;
+package com.github.sylvain121.SimpleRemoteDesktop.player.video;
 
 import android.util.Log;
 
-import com.example.esme7383.myapplication.player.Message;
+import com.github.sylvain121.SimpleRemoteDesktop.player.Message;
 
 import java.io.IOException;
 import java.io.OutputStream;

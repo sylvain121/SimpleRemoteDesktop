@@ -1,8 +1,8 @@
-package com.example.esme7383.myapplication.discovery;
+package com.github.sylvain121.SimpleRemoteDesktop.discovery;
 
 import android.util.Log;
 
-import com.example.esme7383.myapplication.MainActivity;
+import com.github.sylvain121.SimpleRemoteDesktop.MainActivity;
 
 import java.io.IOException;
 import java.net.*;

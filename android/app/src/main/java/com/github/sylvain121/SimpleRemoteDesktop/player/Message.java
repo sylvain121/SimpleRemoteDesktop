@@ -1,4 +1,4 @@
-package com.example.esme7383.myapplication.player;
+package com.github.sylvain121.SimpleRemoteDesktop.player;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

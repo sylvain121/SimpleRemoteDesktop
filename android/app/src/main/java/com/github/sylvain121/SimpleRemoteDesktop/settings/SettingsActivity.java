@@ -1,4 +1,4 @@
-package com.example.esme7383.myapplication.settings;
+package com.github.sylvain121.SimpleRemoteDesktop.settings;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.esme7383.myapplication.R;
+import com.github.sylvain121.SimpleRemoteDesktop.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,8 +73,6 @@ public class SettingsActivity extends Activity {
         fpsArray.add("24");
         fpsArray.add("30");
         fpsArray.add("60");
-        fpsArray.add("100");
-        fpsArray.add("200");
         ArrayAdapter<String> fpsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, fpsArray);
         fpsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         fpsItems = (Spinner) findViewById(R.id.sprinnerFrameRate);
