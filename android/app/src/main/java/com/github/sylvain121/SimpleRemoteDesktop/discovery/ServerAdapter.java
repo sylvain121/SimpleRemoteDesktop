@@ -1,4 +1,4 @@
-package com.example.esme7383.myapplication.discovery;
+package com.github.sylvain121.SimpleRemoteDesktop.discovery;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.example.esme7383.myapplication.R;
+import com.github.sylvain121.SimpleRemoteDesktop.R;
 
 import java.util.ArrayList;
 

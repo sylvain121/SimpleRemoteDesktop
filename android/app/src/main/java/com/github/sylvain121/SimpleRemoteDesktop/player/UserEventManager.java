@@ -1,9 +1,9 @@
-package com.example.esme7383.myapplication.player;
+package com.github.sylvain121.SimpleRemoteDesktop.player;
 
 import android.util.Log;
 import android.view.MotionEvent;
 
-import com.example.esme7383.myapplication.player.video.DataManagerChannel;
+import com.github.sylvain121.SimpleRemoteDesktop.player.video.DataManagerChannel;
 
 /**
  * Created by ESME7383 on 02/08/2017.

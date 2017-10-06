@@ -1,4 +1,4 @@
-package com.example.esme7383.myapplication;
+package com.github.sylvain121.SimpleRemoteDesktop;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
