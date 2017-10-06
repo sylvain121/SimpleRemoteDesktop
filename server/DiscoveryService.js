@@ -32,7 +32,7 @@ server.bind(function() {
 function broadcastNew() {
 	broadcastAddressArray.forEach(function(address){
 		server.send(message, 0, message.length, PORT, address,  function() {
-			console.log("Sent '" + message + "'");
+//			console.log("Sent '" + message + "'");
 
 		});
 
