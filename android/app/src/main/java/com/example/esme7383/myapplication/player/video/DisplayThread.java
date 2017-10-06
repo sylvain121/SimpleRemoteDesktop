@@ -2,6 +2,7 @@ package com.example.esme7383.myapplication.player.video;
 
 import android.content.SharedPreferences;
 import android.media.MediaCodec;
+import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.util.Log;
 import android.view.Surface;
@@ -9,6 +10,7 @@ import android.view.Surface;
 import com.example.esme7383.myapplication.settings.SettingsActivity;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -68,8 +70,13 @@ public class DisplayThread extends Thread {
         }
 
         MediaFormat format = MediaFormat.createVideoFormat("video/avc", codec_width, codec_height);
+        format.setInteger(MediaFormat.KEY_MAX_WIDTH, codec_width);
+        format.setInteger(MediaFormat.KEY_MAX_HEIGHT, codec_height);
+        //format.setInteger(MediaFormat.KEY_OPERATING_RATE, Short.MAX_VALUE);
 
         codec.configure(format, surface, null, 0);
+        codec.setVideoScalingMode(MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT);
+
         Log.d(TAG, "Start media codec");
         codec.start();
     }
@@ -96,53 +103,69 @@ public class DisplayThread extends Thread {
             int NAL_START = 1;
             //103, 104 -> SPS, PPS  | 101 -> Data
             int id = 0;
-            int dataOffset = 0;
-
             //Later on this will be serversided, but for now...
             //Separate the SPSPPS from the Data
-            for (int i = 0; i < frameData.length - 4; i++) {
-                id = frameData[i] << 24 | frameData[i + 1] << 16 | frameData[i + 2] << 8
-                        | frameData[i + 3];
-
-                if (id == NAL_START) {
-                    if (frameData[i + 4] == 101) {
-                        dataOffset = i;
-                    }
-                }
-            }
 
 
-            byte[] SPSPPS = Arrays.copyOfRange(frameData, 0, dataOffset);
-            byte[] data = Arrays.copyOfRange(frameData, dataOffset, frameData.length);
 
+/*
             if (SPSPPS.length != 0) {
+                Log.d(TAG, "sps detected : profile : "+SPSPPS[5]+" level : "+SPSPPS[7]);
                 int inIndex = codec.dequeueInputBuffer(100000);
 
                 if (inIndex >= 0) {
                     ByteBuffer input = codec.getInputBuffer(inIndex);
                     input.clear();
+                    SPSPPS[5] = 66;
+                    SPSPPS[7] = 10;
                     input.put(SPSPPS);
                     codec.queueInputBuffer(inIndex, 0, SPSPPS.length, 16, MediaCodec.BUFFER_FLAG_CODEC_CONFIG);
                 }
+            }*/
+
+            int codecFlags = 0;
+            int dataoffset = 0;
+            byte[] SPSPPS = null;
+
+            if(isSPS(frameData)) {
+                //hack SPS to reduce decoder buffer
+                Log.d(TAG, "sps detected : profile : "+frameData[5]+" level : "+frameData[7]);
+                for (int i = 4; i < frameData.length - 4; i++) {
+                    if(frameData[i] == 0 && frameData[i+1] == 0 && frameData[i+2] == 1 ) {
+                        if(frameData[i+3] != 103 && frameData[i+3] != 104) {
+                            dataoffset = i;
+                            break;
+                        }
+                    }
+                }
+
+                SPSPPS = Arrays.copyOfRange(frameData, 0, dataoffset);
+                frameData = Arrays.copyOfRange(frameData, dataoffset, frameData.length);
+
+                Log.d(TAG, "sps length : "+SPSPPS.length);
+                Log.d(TAG, "data length : "+frameData.length);
+
+                SPSPPS[5] = 66; //baseline
+                SPSPPS[7] = 32; // level 3.2
+                Log.d(TAG, "sps new : profile : "+SPSPPS[5]+" level : "+SPSPPS[7]);
+
             }
+
             /*Edit end*/
             if(!decoderStoped) {
-
-                int inIndex = codec.dequeueInputBuffer(10000); // TODO crash on  finish activity
-                if (inIndex >= 0) {
-                    ByteBuffer inputBuffer = codec.getInputBuffer(inIndex);
-                    inputBuffer.clear();
-                    //inputBuffer.put(data);
-                    inputBuffer.put(frameData);
-                    //codec.queueInputBuffer(inIndex, 0, data.length, 16, 0);
-                    codec.queueInputBuffer(inIndex, 0, frameData.length, 16, 0);
+                if(SPSPPS != null) {
+                    Log.d(TAG, "Update CONFIG");
+                    sendToInputBuffer(SPSPPS, MediaCodec.BUFFER_FLAG_CODEC_CONFIG);
                 }
+
+                sendToInputBuffer(frameData, 0);
 
                 MediaCodec.BufferInfo buffInfo = new MediaCodec.BufferInfo();
                 int outIndex = codec.dequeueOutputBuffer(buffInfo, 10000);
 
                 switch (outIndex) {
                     case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+                        Log.d(TAG, "output format changed");
                         break;
                     case MediaCodec.INFO_TRY_AGAIN_LATER:
                         break;
@@ -158,6 +181,26 @@ public class DisplayThread extends Thread {
         }
 
         codec.release();
+    }
+
+    private void sendToInputBuffer(byte[] frameData, int codecFlags) {
+        long timestampUs = System.nanoTime() / 1000;
+        Log.d(TAG, "buffer number : "+codec.getInputBuffers().length);
+        int inIndex = codec.dequeueInputBuffer(100000); // TODO crash on  finish activity
+        if (inIndex >= 0) {
+            ByteBuffer inputBuffer = codec.getInputBuffer(inIndex);
+            ;
+            inputBuffer.clear();
+            //inputBuffer.put(data);
+            inputBuffer.put(frameData);
+            //codec.queueInputBuffer(inIndex, 0, data.length, 16, 0);
+            codec.queueInputBuffer(inIndex, 0, frameData.length, timestampUs, codecFlags);
+        }
+    }
+
+    private boolean isSPS(byte[] frameData) {
+        return frameData[4] == 0x67;
+
     }
 
     public void close() {

@@ -74,7 +74,7 @@ public class SettingsActivity extends Activity {
         fpsArray.add("30");
         fpsArray.add("60");
         fpsArray.add("100");
-
+        fpsArray.add("200");
         ArrayAdapter<String> fpsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, fpsArray);
         fpsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         fpsItems = (Spinner) findViewById(R.id.sprinnerFrameRate);
