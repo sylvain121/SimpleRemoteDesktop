@@ -4,40 +4,40 @@ const socket = require("./socket");
 const SDLKey = require('./SDLKeysymToX11Keysym');
 
 var lb = Buffer.allocUnsafe(4);
-var timer = null;
 var running = false;
-
-var frameSend = true;
+var frameNumberBuffer = Buffer.allocUnsafe(4);
+var frameCounter = 0;
 
 var options = {
-	inputWidth: 0,
-	inputHeight: 0,
-	outputWidth: 0,
-	outputHeight: 0,
-	distantDisplayWidth: 0,
-	distantDisplayHeight: 0,
-	bit_rate: 10000000,
-	fps: 60,
-	sample: encoder.YUV_420P
+inputWidth: 0,
+	    inputHeight: 0,
+	    outputWidth: 0,
+	    outputHeight: 0,
+	    distantDisplayWidth: 0,
+	    distantDisplayHeight: 0,
+	    bit_rate: 10000000,
+	    fps: 60,
+	    sample: encoder.YUV_420P
 };
 
 module.exports.free = free;
 
-function free() {
-	console.log("FREEing CAPTURE");
+function freeDesktop() {
+	console.log( "freeing desktop capture" );
 	var x11ModuleName = require.resolve("node-x11");
-	var encoderModuleName = require.resolve('node-avcodec-h264-encoder');
-
 	delete require.cache[x11ModuleName];
-	delete require.cache[encoderModuleName];
-	try {
-		clearInterval(timer);
-	} catch (e) {
-		console.error(e);
-	}
+}
 
-	frameSend  = true;
+function freeEncoder() {
+	console.log("freeing encoder");
+	var encoderModuleName = require.resolve('node-avcodec-h264-encoder');
+	delete require.cache[encoderModuleName];
+}
+
+function free() {
 	running = false;
+	freeDesktop();
+	freeEncoder();
 
 }
 
@@ -52,39 +52,36 @@ module.exports.start = function(distantWidth, distantHeight, codecWidth, codecHe
 	options.distantDisplayHeight = distantHeight;
 	options.bit_rate = bandwidth;
 	options.fps = fps;
-	timer = setInterval(getFrame, 1000 / options.fps);
+	options.period = 1000 / options.fps;
+
+	frameCounter = 0;
+	getFrame();
 }
 
 module.exports.stop = function() {
-	try {
-		clearInterval(timer);
-	} catch (e) {
-		console.error(e);
-	}
-
 	running = false;
-	frameSend  = true;
+	free();
 }
 
 
 function getFrame() {
+
 	var initTime = new Date();
 	if (!running) {
 		x11.init();
-		SDLKey.SDLKeyToKeySym_init();
-
+		//SDLKey.SDLKeyToKeySym_init();
 	}
 
 	var img = x11.getImage();
-	var getImageTime = new Date();
-	options.inputWidth = img.width;
-	options.inputHeight = img.height;
-	if(options.distantDisplayWidth ===0 || options.distantDisplayHeight === 0) {
-		options.distantDisplayWidth = img.width;
-		options.distantDisplayHeight = img.height;
-	}
 
+	if (options.inputWidth !== img.width || options.inputHeight !== img.height) {
+		console.log("resolution changed : reconfiguring encoder");
+		freeEncoder();
+		running = false;
+	}
 	if (!running) {
+		options.inputWidth = img.width;
+		options.inputHeight = img.height;
 		setMouseDistantScreenSize(options.distantDisplayWidth, options.distantDisplayHeight);
 		console.log("init video stream");
 		console.log(options);
@@ -92,27 +89,33 @@ function getFrame() {
 		running = true;
 	}
 
-	if (frameSend) {
-		var frame = encoder.encodeFrameSync(img.data);
+	var frame = encoder.encodeFrameSync(img.data);
 
-		if (frame !== undefined) {
-			frameSend = false;
-			var frameTime = new Date();
+	if (frame !== undefined) {
+		frameSend = false;
+		var frameTime = new Date();
 
-			if (socket.getSocket() == null) {
-				free();
-			} else {
+		if (socket.getSocket() == null) {
+			free();
+		} else {
 
-				//TODO android patch 
-				lb.writeInt32BE(frame.length);
-				socket.getSocket().write(lb, function() {
-					socket.getSocket().write(frame, function() {
-						frameSend = true;
+			//TODO android patch 
+			lb.writeInt32BE(frame.length);
+			frameNumberBuffer.writeInt32BE(frameCounter++);
+			socket.getSocket().write(frameNumberBuffer, function(){
+					console.log('sending frame number : '+frameCounter);
+					socket.getSocket().write(lb, function() {
+							socket.getSocket().write(frame, function() {
+									var t = new Date() - initTime;
+									if(running) {
+									setTimeout(getFrame, options.period - t);
+									}
+									});
+							});
 					});
-				});
 
 
-			}
+
 		}
 	}
 }
