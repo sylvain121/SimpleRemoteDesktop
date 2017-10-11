@@ -5,19 +5,19 @@ const SDLKey = require('./SDLKeysymToX11Keysym');
 
 var lb = Buffer.allocUnsafe(4);
 var running = false;
-
-var frameSend = true;
+var frameNumberBuffer = Buffer.allocUnsafe(4);
+var frameCounter = 0;
 
 var options = {
-	inputWidth: 0,
-	inputHeight: 0,
-	outputWidth: 0,
-	outputHeight: 0,
-	distantDisplayWidth: 0,
-	distantDisplayHeight: 0,
-	bit_rate: 10000000,
-	fps: 60,
-	sample: encoder.YUV_420P
+inputWidth: 0,
+	    inputHeight: 0,
+	    outputWidth: 0,
+	    outputHeight: 0,
+	    distantDisplayWidth: 0,
+	    distantDisplayHeight: 0,
+	    bit_rate: 10000000,
+	    fps: 60,
+	    sample: encoder.YUV_420P
 };
 
 module.exports.free = free;
@@ -53,6 +53,8 @@ module.exports.start = function(distantWidth, distantHeight, codecWidth, codecHe
 	options.bit_rate = bandwidth;
 	options.fps = fps;
 	options.period = 1000 / options.fps;
+
+	frameCounter = 0;
 	getFrame();
 }
 
@@ -99,14 +101,19 @@ function getFrame() {
 
 			//TODO android patch 
 			lb.writeInt32BE(frame.length);
-			socket.getSocket().write(lb, function() {
-				socket.getSocket().write(frame, function() {
-					var t = new Date() - initTime;
-					if(running) {
-						setTimeout(getFrame, options.period - t);
-					}
-				});
-			});
+			frameNumberBuffer.writeInt32BE(frameCounter++);
+			socket.getSocket().write(frameNumberBuffer, function(){
+					console.log('sending frame number : '+frameCounter);
+					socket.getSocket().write(lb, function() {
+							socket.getSocket().write(frame, function() {
+									var t = new Date() - initTime;
+									if(running) {
+									setTimeout(getFrame, options.period - t);
+									}
+									});
+							});
+					});
+
 
 
 		}
