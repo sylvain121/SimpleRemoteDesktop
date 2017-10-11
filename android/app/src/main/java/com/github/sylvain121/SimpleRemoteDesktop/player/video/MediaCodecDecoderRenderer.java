@@ -572,13 +572,13 @@ public class MediaCodecDecoderRenderer {
 
             inputBufferIndex = dequeueInputBuffer();
             if (inputBufferIndex < 0) {
-                Log.d(TAG, "NEED IDR !!!!");
+                Log.d(TAG, "NEED_IDR_1!!!!");
                 return 1;
             }
 
             buf = getEmptyInputBuffer(inputBufferIndex);
             if (buf == null) {
-                Log.d(TAG,"NEEED IDR !!!!");
+                Log.d(TAG,"NEEED_IDR_2 !!!!");
                 return 1;
             }
 
@@ -593,11 +593,11 @@ public class MediaCodecDecoderRenderer {
             if (queueInputBuffer(inputBufferIndex,
                     0, buf.position(),
                     timestampUs, codecFlags)) {
-                Log.d(TAG, "DR OK");
+                Log.d(TAG, "DR_OK_1");
                 return 1;
             }
             else {
-                Log.d(TAG,"NEED IDR");
+                Log.d(TAG,"NEED_IDR_3");
                 return 1;
             }
 
@@ -609,14 +609,14 @@ public class MediaCodecDecoderRenderer {
             inputBufferIndex = dequeueInputBuffer();
             if (inputBufferIndex < 0) {
                 // We're being torn down now
-                Log.d(TAG, "NEED IDR");
+                Log.d(TAG, "NEED_IDR_4");
                 return 1;
             }
 
             buf = getEmptyInputBuffer(inputBufferIndex);
             if (buf == null) {
                 // We're being torn down now
-                Log.d(TAG, "NEED IDR");
+                Log.d(TAG, "NEED_IDR_5");
                 return 1;
             }
 
@@ -634,7 +634,7 @@ public class MediaCodecDecoderRenderer {
             // Batch this to submit together with SPS and PPS per AOSP docs
             vpsBuffer = new byte[frameLength];
             System.arraycopy(frameData, 0, vpsBuffer, 0, frameLength);
-            Log.d(TAG, "DR OK");
+            Log.d(TAG, "DR OK_2");
             return 1;
         }
         else if (frameData[4] == 0x42) {
@@ -643,7 +643,7 @@ public class MediaCodecDecoderRenderer {
             // Batch this to submit together with VPS and PPS per AOSP docs
             spsBuffer = new byte[frameLength];
             System.arraycopy(frameData, 0, spsBuffer, 0, frameLength);
-            Log.d(TAG, "DR OK");
+            Log.d(TAG, "DR OK_3");
             return 1;
         }
         else if (frameData[4] == 0x44) {
@@ -652,14 +652,14 @@ public class MediaCodecDecoderRenderer {
             inputBufferIndex = dequeueInputBuffer();
             if (inputBufferIndex < 0) {
                 // We're being torn down now
-                Log.d(TAG, "NEED IDR");
+                Log.d(TAG, "NEED_IDR_6");
                 return 1;
             }
 
             buf = getEmptyInputBuffer(inputBufferIndex);
             if (buf == null) {
                 // We're being torn down now
-                Log.d(TAG, "NEED IDR");
+                Log.d(TAG, "NEED_IDR_7");
                 return 1;
             }
 
@@ -679,14 +679,14 @@ public class MediaCodecDecoderRenderer {
             inputBufferIndex = dequeueInputBuffer();
             if (inputBufferIndex < 0) {
                 // We're being torn down now
-                Log.d(TAG, "NEED IDR");
+                Log.d(TAG, "NEED_IDR_8");
                 return 1;
             }
 
             buf = getEmptyInputBuffer(inputBufferIndex);
             if (buf == null) {
                 // We're being torn down now
-                Log.d(TAG, "NEED IDR");
+                Log.d(TAG, "NEED_IDR_9");
                 return 1;
             }
         }
@@ -697,12 +697,12 @@ public class MediaCodecDecoderRenderer {
         if (!queueInputBuffer(inputBufferIndex,
                 0, buf.position(),
                 timestampUs, codecFlags)) {
-            Log.d(TAG, "NEED IDR");
+            Log.d(TAG, "NEED_IDR_10");
         }
 
         if (needsSpsReplay) {
             if (!replaySps()) {
-                Log.d(TAG, "NEED IDR");
+                Log.d(TAG, "NEED_IDR_11");
                 return 1;
             }
 
@@ -710,7 +710,7 @@ public class MediaCodecDecoderRenderer {
             return 1;
         }
 
-        Log.d(TAG, "DR OK");
+        Log.d(TAG, "DR OK_1");
         return 1;
     }
 

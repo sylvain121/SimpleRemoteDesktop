@@ -1,6 +1,7 @@
 package com.github.sylvain121.SimpleRemoteDesktop.player;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.github.sylvain121.SimpleRemoteDesktop.player.video.DataManagerChannel;
 import com.github.sylvain121.SimpleRemoteDesktop.player.video.MediaCodecDecoderRenderer;
@@ -23,6 +24,8 @@ class ConnectionThread extends Thread {
     private DataManagerChannel m_renderSock;
     private MediaCodecDecoderRenderer mediaCodec;
     private int FrameNumber = 0;
+
+    private final static String TAG = "CONNEXION_THREAD";
 
     public ConnectionThread(int width, int height, String ipAddress, SharedPreferences sharedPreference) {
 
@@ -65,6 +68,7 @@ class ConnectionThread extends Thread {
 
         while (!Thread.interrupted()) {
             byte[] frameData = m_renderSock.receive();
+            Log.d(TAG, "frame type : "+ frameData[4]);
             if(frameData[4] == 0x67) {
                 int ppsOffset = 0;
                 int dataOffset = 0;
@@ -95,10 +99,15 @@ class ConnectionThread extends Thread {
     }
 
     private void sendFrame(byte[] data) {
+        Log.d(TAG, "sending new frame");
         this.mediaCodec.submitDecodeUnit(data, data.length, this.FrameNumber++,System.currentTimeMillis());
     }
 
     public void setDecoderHandler(MediaCodecDecoderRenderer mediaCodec) {
         this.mediaCodec = mediaCodec;
+    }
+
+    public void close() {
+        m_renderSock.closeChannel();
     }
 }
