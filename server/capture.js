@@ -42,7 +42,6 @@ function free() {
 }
 
 
-module.exports.free = free;
 module.exports.start = function(distantWidth, distantHeight, codecWidth, codecHeight, bandwidth, fps) {
 
 	console.log("Starting new capture session");
