@@ -37,7 +37,7 @@ public class DataManagerChannel {
             chan = SocketChannel.open();
             chan.connect(socketAddr);
             output = chan.socket().getOutputStream();
-            buf = ByteBuffer.allocate(512*1024);
+            buf = ByteBuffer.allocate(2048*1024);
             buf.limit (0);
 
         } catch (IOException e) {
@@ -66,13 +66,16 @@ public class DataManagerChannel {
         try {
 
             if (chan.isConnected()) {
-                //long startTime = System.currentTimeMillis();
                 ensure(4, chan);
-                //Log.d("VIDEO DECODER THREAD", "get body time : "+(System.currentTimeMillis() - startTime));
+                int frameNumber = buf.getInt();
+                Log.d(TAG, "receiving frame number : "+ frameNumber);
+                ensure(4, chan);
                 int len = buf.getInt();
+                Log.d(TAG, "new frame size : "+len);
                 ensure(len, chan);
                 frame = new byte[len];
                 buf.get(frame, 0, len);
+                Log.d(TAG, "new frame array length :"+frame.length);
             } else {
                 Log.d("VIDEO DECODER THREAD","Socket not connected reconnect");
 

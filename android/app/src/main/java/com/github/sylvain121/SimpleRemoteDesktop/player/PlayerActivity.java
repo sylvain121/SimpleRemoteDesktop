@@ -81,6 +81,12 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback, 
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+        if(mediaCodec != null || cnx != null) {
+            mediaCodec.stop();
+            cnx.close();
+        }
+
         Log.d(TAG, "width : "+width+ "height : "+height);
 
         SharedPreferences sharedPreference = getBaseContext().getSharedPreferences(SettingsActivity.SIMPLE_REMOTE_DESKTOP_PREF, 0);
