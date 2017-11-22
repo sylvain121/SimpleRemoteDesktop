@@ -29,7 +29,7 @@ ffmpeg:
 	rm -Rf ffmpeg-3.4*
 
 client:
-	i686-w64-mingw32-gcc $(CFLAGS) $(LDFLAGS) -o $(shell pwd)/windows/bin/client.exe client.c -lavutil -lavformat -lavcodec -lavutil -lswscale -lSDL2 -lSDL2_net
+	i686-w64-mingw32-gcc $(CFLAGS) $(LDFLAGS) -static-libgcc -static-libstdc++ -o $(shell pwd)/windows/bin/client.exe client.c -lavformat -lavcodec -lavutil -lswscale -lSDL2 -lSDL2_net
 
 clean:
 	rm -Rf windows
@@ -40,5 +40,6 @@ dist:
 	$(eval OUT = $(shell pwd)/out/)
 	cp $(BINDIR)/client.exe $(OUT)
 	cp $(BINDIR)/*.dll $(OUT)
+	cp dll/*.dll $(OUT)
 	cd out; zip ../client_windows.zip *
 	rm -Rf out/
