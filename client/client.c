@@ -200,7 +200,7 @@ if(video_definition != NULL)
 			pCodecCtx->pix_fmt,
 			codec_width, 
 			codec_height,
-			PIX_FMT_YUV420P,
+			AV_PIX_FMT_YUV420P,
 			SWS_FAST_BILINEAR,
 			NULL,
 			NULL,

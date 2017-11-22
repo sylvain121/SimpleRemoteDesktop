@@ -8,6 +8,13 @@ ubuntu package :
 ```bash
 sudo apt-get install build-essentials libavutil-dev libavcodec-dev libswscale-dev libx264-dev libsdl2-dev libsdl2-net-dev
 ```
+windows : 
+```bash
+sudo apt-get install mingw-w64
+```
+
+## build for windows
+
 
 ## run the client
 
