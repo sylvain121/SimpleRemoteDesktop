@@ -1,7 +1,8 @@
 CURRENT_DIR = $(shell pwd)
 LIBDIR = $(CURRENT_DIR)/windows/lib
 CFLAGS = -I$(CURRENT_DIR)/windows/include
-LDFLAGS = -L$(CURRENT_DIR)/windows/bin
+BINDIR = $(CURRENT_DIR)/windows/bin
+LDFLAGS = -L$(BINDIR)
 
 SDL2:
 	wget https://www.libsdl.org/release/SDL2-2.0.7.tar.gz
@@ -32,3 +33,12 @@ client:
 
 clean:
 	rm -Rf windows
+
+dist:
+	rm -Rf out/
+	mkdir out
+	$(eval OUT = $(shell pwd)/out/)
+	cp $(BINDIR)/client.exe $(OUT)
+	cp $(BINDIR)/*.dll $(OUT)
+	cd out; zip ../client_windows.zip *
+	rm -Rf out/
