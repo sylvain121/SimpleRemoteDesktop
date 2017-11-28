@@ -39,6 +39,7 @@ public class Message {
     private int codec_height = 0;
     private int bandwidth = 0;
     private int fps = 0;
+    private int sdl = 0;
 
     public void setType(int type) {
         this.type = type;
@@ -113,6 +114,7 @@ public class Message {
         bb.putInt(codec_height);
         bb.putInt(bandwidth);
         bb.putInt(fps);
+        bb.putInt(sdl);
 
         return bb.array();
     }
@@ -133,6 +135,8 @@ public class Message {
         bb.putInt(codec_height);
         bb.putInt(bandwidth);
         bb.putInt(fps);
+        bb.putInt(sdl);
+
 
         bb.flip();
 
