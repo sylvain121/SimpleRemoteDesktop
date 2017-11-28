@@ -83,7 +83,6 @@ public class Message {
         message.codec_width = codec_width;
         message.codec_height = codec_height;
         message.bandwidth = bandwidth;
-	message.sdl = sdl;
 
         return message;
 
@@ -91,7 +90,7 @@ public class Message {
 
     public byte[] toBytes() {
 
-        ByteBuffer bb = ByteBuffer.allocate(44);
+        ByteBuffer bb = ByteBuffer.allocate(48);
         bb.order(ByteOrder.LITTLE_ENDIAN);
         bb.putInt(type);
         bb.putInt(x);
@@ -104,13 +103,14 @@ public class Message {
         bb.putInt(codec_height);
         bb.putInt(bandwidth);
         bb.putInt(fps);
+        bb.putInt(sdl);
 
         return bb.array();
     }
 
     public ByteBuffer toByteBuffer() {
 
-        ByteBuffer bb = ByteBuffer.allocate(44);
+        ByteBuffer bb = ByteBuffer.allocate(48);
         bb.clear();
         bb.order(ByteOrder.LITTLE_ENDIAN);
         bb.putInt(type);
@@ -124,6 +124,7 @@ public class Message {
         bb.putInt(codec_height);
         bb.putInt(bandwidth);
         bb.putInt(fps);
+        bb.putInt(sdl);
 
         bb.flip();
 
