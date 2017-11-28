@@ -26,6 +26,15 @@
 #define av_frame_free avcodec_free_frame
 #endif
 
+
+
+void SRD_ensure(int nbytes );
+int SRD_readUInt32();
+uint8_t * SRD_read(int nbytes);
+int SRDNet_get_frame_length();
+int SRDNet_get_frame_number();
+
+
 enum type {TYPE_KEY_DOWN=1, TYPE_KEY_UP=2, TYPE_MOUSE_MOTION=3, TYPE_MOUSE_DOWN=4, TYPE_MOUSE_UP=5 , TYPE_ENCODER_START=6, TYPE_ENCODER_STOP=7 };
 
 struct Message
@@ -43,6 +52,11 @@ struct Message
 	int fps;
 };
 
+uint8_t inbuf[INBUF_SIZE + FF_INPUT_BUFFER_PADDING_SIZE];
+//memset(inbuf+INBUF_SIZE, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+IPaddress ip;
+TCPsocket sd;
+int inbuf_average = 0;
 
 int main(int argc, char *argv[]) 
 {
@@ -64,36 +78,36 @@ int main(int argc, char *argv[])
 
 
 	if(argv[4] != NULL && atoi(argv[4]) > 0) // have custom bandwidth
-{
-bandwidth = atoi(argv[4]);
-}	
+	{
+		bandwidth = atoi(argv[4]);
+	}	
 
-if(argv[4] != NULL && atoi(argv[5]) > 0) //have custom fps
-{
-fps = atoi(argv[5]); 
-}
+	if(argv[4] != NULL && atoi(argv[5]) > 0) //have custom fps
+	{
+		fps = atoi(argv[5]); 
+	}
 
 
-	
- printf("parameters hostname : %s, port : %d, video resolution : %s, bandwidth : %dKb, fps : %d \n", hostname, port, video_definition, bandwidth, fps);
 
- 
-if(video_definition != NULL)
-{
- if(strcmp("720p", video_definition) == 0)
- {
-	codec_width = 1280;
-	codec_height = 720;
-	printf("swicth video resolution to %dx%d \n", codec_width, codec_height);
- }  
+	printf("parameters hostname : %s, port : %d, video resolution : %s, bandwidth : %dKb, fps : %d \n", hostname, port, video_definition, bandwidth, fps);
 
- if(strcmp("1080p", video_definition) == 0)
- {
-	screen_width = codec_width = 1920;
-	screen_height = codec_height = 1080;
-	printf("swicth video resolution to %dx%d \n", codec_width, codec_height);
- } 
-} 
+
+	if(video_definition != NULL)
+	{
+		if(strcmp("720p", video_definition) == 0)
+		{
+			codec_width = 1280;
+			codec_height = 720;
+			printf("swicth video resolution to %dx%d \n", codec_width, codec_height);
+		}  
+
+		if(strcmp("1080p", video_definition) == 0)
+		{
+			screen_width = codec_width = 1920;
+			screen_height = codec_height = 1080;
+			printf("swicth video resolution to %dx%d \n", codec_width, codec_height);
+		} 
+	} 
 
 
 
@@ -101,7 +115,7 @@ if(video_definition != NULL)
 	/** key press logger for exit event ctrl + alt+ q **/
 	int ctrl_press = false;
 	int alt_press = false;
-	
+
 	// SDL Event
 	SDL_Event userEvent;
 	bool quit = false;
@@ -125,8 +139,7 @@ if(video_definition != NULL)
 	size_t yPlaneSz, uvPlaneSz;
 	int uvPitch;
 
-	uint8_t inbuf[INBUF_SIZE + FF_INPUT_BUFFER_PADDING_SIZE];
-	memset(inbuf + INBUF_SIZE, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+
 
 	// Register all formats and codecs
 	av_register_all();
@@ -173,9 +186,9 @@ if(video_definition != NULL)
 			screen_width,
 			screen_height,
 			0);
-	
 
-		renderer = SDL_CreateRenderer(screen, -1, 0);
+
+	renderer = SDL_CreateRenderer(screen, -1, 0);
 	if (!renderer) {
 		fprintf(stderr, "SDL: could not create renderer - exiting\n");
 		exit(1);
@@ -230,8 +243,7 @@ if(video_definition != NULL)
 	 */
 
 	fprintf(stdout, "video width : %i, height : %i, fps : %i\n ", pCodecCtx->width, pCodecCtx->height, fps);
-	IPaddress ip;
-	TCPsocket sd;
+
 
 	if(SDLNet_Init() < 0 ) {
 		fprintf(stderr, "SDLNet_Init: %s\n", SDLNet_GetError());
@@ -268,8 +280,7 @@ if(video_definition != NULL)
 	parser = av_parser_init(pCodecCtx->codec_id);
 	parser->flags |= PARSER_FLAG_ONCE;
 	int parserLenght = 0;
-	char net_in[INBUF_SIZE];
-	int inbuf_average = 0;
+
 
 
 	int screen_is_fullscreen = 0;
@@ -278,12 +289,12 @@ if(video_definition != NULL)
 	for(;;) {
 
 
-	// sdl event
-		 
+		// sdl event
+
 		while(SDL_PollEvent(&userEvent)) {
 
 			struct Message send; 
-			
+
 			switch(userEvent.type) {
 				case SDL_QUIT: 
 					quit = true;
@@ -303,18 +314,18 @@ if(video_definition != NULL)
 						quit = true;
 					} else 	if(userEvent.key.keysym.sym == 102 && ctrl_press && alt_press){
 						if(screen_is_fullscreen) 
-					{
-						screen_is_fullscreen = false;
-						SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN_DESKTOP);						
-					} 
-					else
-					{
-						screen_is_fullscreen = true;
-						SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN);
-					} 
-						
+						{
+							screen_is_fullscreen = false;
+							SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN_DESKTOP);						
+						} 
+						else
+						{
+							screen_is_fullscreen = true;
+							SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN);
+						} 
+
 					} else {
-					SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
+						SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 					} 
 
 
@@ -391,25 +402,25 @@ if(video_definition != NULL)
 								   SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 								   break;
 							   }
- 
-				
+
+
 			}
 
-			
+
 
 		}
 
 		if(quit)
 			break;
-		
-		 
-		  //Video decode part
-		 
-		 
-		av_init_packet(&packet);
 
-		int net_lenght =SDLNet_TCP_Recv(sd, net_in, 64);
-		memcpy(inbuf+inbuf_average, net_in, net_lenght);
+
+		//Video decode part
+
+
+		av_init_packet(&packet);
+		/*
+		   int net_lenght =SDLNet_TCP_Recv(sd, net_in, 64);
+		   memcpy(inbuf+inbuf_average, net_in, net_lenght);
 		//printf("inbuf_average %i  + network length %i \n", inbuf_average, net_lenght);
 		inbuf_average = net_lenght + inbuf_average;
 		//printf("result inbuf_average %i \n", inbuf_average);
@@ -423,6 +434,41 @@ if(video_definition != NULL)
 		//printf("inbuf_average %i\n", inbuf_average);
 		// if(net_lenght == 0)
 		// 	break;
+		*/
+		//read frame number
+		/*	
+			uint8_t frame_counter_buffer[4];
+			SDLNet_TCP_Recv(sd, frame_counter_buffer, 4);
+			int frame_number = SDLNet_Read32(frame_counter_buffer);
+			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "frame number %i", frame_number);
+
+		// read frame size
+
+		uint8_t length_buffer[4];
+		SDLNet_TCP_Recv(sd, length_buffer, 4);
+		int frame_length = SDLNet_Read32(length_buffer);
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, " frame length %i", frame_length);
+
+		//read frame
+
+		uint8_t frame[frame_length];
+		SDLNet_TCP_Recv(sd, frame, frame_length);
+		*/		
+
+		int frame_counter = SRDNet_get_frame_number();
+		int frame_length =  SRDNet_get_frame_length();
+
+		SRD_ensure(frame_length);
+		uint8_t *frame = SRD_read(frame_length);
+
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "frame number : %d, frame size : %d", frame_counter, frame_length);
+
+
+
+
+
+		packet.data = frame;
+		packet.size = frame_length;	
 
 		while(packet.size > 0) {
 
@@ -476,7 +522,7 @@ if(video_definition != NULL)
 			av_free_packet(&packet);
 		}
 
-			
+
 	}
 
 
@@ -492,3 +538,55 @@ if(video_definition != NULL)
 	return 0;
 
 }
+
+int SRDNet_get_frame_number()
+{
+	SRD_ensure(4);
+	return SRD_readUInt32();
+
+}
+
+int SRDNet_get_frame_length()
+{
+	SRD_ensure(4);
+	return SRD_readUInt32();
+}
+
+void SRD_ensure(int nbytes )
+{
+
+	char net_in[nbytes+1];
+	do
+	{
+		int net_lenght = SDLNet_TCP_Recv(sd, net_in, nbytes+1); //FIXME : adjust max data
+		memcpy(inbuf+inbuf_average, net_in, net_lenght);
+		inbuf_average = net_lenght + inbuf_average;
+	}
+
+	while( inbuf_average < nbytes );
+
+}
+
+int SRD_readUInt32()
+{
+	uint8_t *data = SRD_read(4);
+
+	uint32_t num = 
+		(uint32_t)data[0] << 24 |
+		(uint32_t) data[1] << 16 |
+		(uint32_t) data[2] << 8  |
+		(uint32_t) data[3];
+
+	return num;
+}
+
+uint8_t * SRD_read(int nbytes)
+{
+	uint8_t *data = malloc(sizeof(uint8_t)* nbytes);
+	memcpy(data, inbuf, nbytes);	
+	memcpy(inbuf, inbuf+nbytes, inbuf_average - nbytes);
+	inbuf_average -= nbytes;
+	return data;
+}
+
+
