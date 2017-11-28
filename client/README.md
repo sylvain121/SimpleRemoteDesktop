@@ -28,3 +28,4 @@ sudo apt-get install mingw-w64
 3. video resolution : 720p or 1080p ( 1080p is currently buggy ).( optional, default:800x600 )
 4. bandwidth : bandwidth of the video stream in bit( optional, default : 10Mbit )
 5. framerate : video refreash rate in frame by second( optional, default : 25 );
+

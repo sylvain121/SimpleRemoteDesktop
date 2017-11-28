@@ -1,4 +1,8 @@
 <resources>
+    <string name="settings">settings</string>
     <string name="app_name">SimpeRemoteDesktop</string>
     <string name="action_settings">Settings</string>
+    <string name="codec_resolution">video resolution</string>
+    <string name="stream_bitrate">video bitrate</string>
+    <string name="fps">frame rate</string>
 </resources>

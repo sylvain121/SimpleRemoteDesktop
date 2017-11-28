@@ -1,13 +1,9 @@
 var capture = require('./capture');
 var socket = require('./socket');
-
+var discovery = require("./DiscoveryService.js");
 
 socket.registerMessageHandler(onNewMessage);
 socket.registerdisconnectHander(capture.free);
-
-
-
-
 
 function onNewMessage(message) {
 
