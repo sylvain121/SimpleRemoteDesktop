@@ -10,7 +10,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
 
-
 #define INBUF_SIZE 1000000
 #define FF_INPUT_BUFFER_PADDING_SIZE 32
 
@@ -50,6 +49,7 @@ struct Message
 	int codec_height;
 	int bandwidth;
 	int fps;
+	int sdl;
 };
 
 uint8_t inbuf[INBUF_SIZE + FF_INPUT_BUFFER_PADDING_SIZE];
@@ -268,6 +268,7 @@ int main(int argc, char *argv[])
 	init.codec_width = codec_width;
 	init.codec_height = codec_height;
 	init.bandwidth = bandwidth;
+	init.sdl = 1;
 
 
 	SDLNet_TCP_Send(sd, (void * )&init, sizeof(init));
@@ -303,7 +304,6 @@ int main(int argc, char *argv[])
 				case SDL_KEYDOWN: 
 					//printf("pressed key %d\n", userEvent.key.keysym.sym);
 					send.type = TYPE_KEY_DOWN;
-					send.keycode = userEvent.key.keysym.sym;
 					if(userEvent.key.keysym.sym == 1073742048){
 						ctrl_press = true;
 					} 
@@ -325,6 +325,8 @@ int main(int argc, char *argv[])
 						} 
 
 					} else {
+
+						send.keycode = userEvent.key.keysym.sym;
 						SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 					} 
 
@@ -334,13 +336,14 @@ int main(int argc, char *argv[])
 				case SDL_KEYUP: 
 					//printf("released key %d\n", userEvent.key.keysym.sym);
 					send.type = TYPE_KEY_UP;
-					send.keycode = userEvent.key.keysym.sym;
 					if(userEvent.key.keysym.sym == 1073742048){
 						ctrl_press = false;
 					} 
 					if(userEvent.key.keysym.sym == 1073742050){
 						alt_press = false;
 					}
+
+					send.keycode = userEvent.key.keysym.sym;
 					SDLNet_TCP_Send(sd, (void * )&send, sizeof(send));
 					break;				
 
