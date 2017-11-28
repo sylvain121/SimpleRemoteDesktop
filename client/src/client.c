@@ -280,9 +280,6 @@ int main(int argc, char *argv[])
 
 	parser = av_parser_init(pCodecCtx->codec_id);
 	parser->flags |= PARSER_FLAG_ONCE;
-	int parserLenght = 0;
-
-
 
 	int screen_is_fullscreen = 0;
 
@@ -421,42 +418,6 @@ int main(int argc, char *argv[])
 
 
 		av_init_packet(&packet);
-		/*
-		   int net_lenght =SDLNet_TCP_Recv(sd, net_in, 64);
-		   memcpy(inbuf+inbuf_average, net_in, net_lenght);
-		//printf("inbuf_average %i  + network length %i \n", inbuf_average, net_lenght);
-		inbuf_average = net_lenght + inbuf_average;
-		//printf("result inbuf_average %i \n", inbuf_average);
-
-
-		parserLenght = av_parser_parse2(parser, pCodecCtx, &packet.data, &packet.size, &inbuf[0], inbuf_average, pts, dts, AV_NOPTS_VALUE);
-		//printf("Parser length %i\n", parserLenght);
-		memcpy(inbuf, inbuf+parserLenght, inbuf_average - parserLenght);
-		inbuf_average -= parserLenght;
-
-		//printf("inbuf_average %i\n", inbuf_average);
-		// if(net_lenght == 0)
-		// 	break;
-		*/
-		//read frame number
-		/*	
-			uint8_t frame_counter_buffer[4];
-			SDLNet_TCP_Recv(sd, frame_counter_buffer, 4);
-			int frame_number = SDLNet_Read32(frame_counter_buffer);
-			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "frame number %i", frame_number);
-
-		// read frame size
-
-		uint8_t length_buffer[4];
-		SDLNet_TCP_Recv(sd, length_buffer, 4);
-		int frame_length = SDLNet_Read32(length_buffer);
-		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, " frame length %i", frame_length);
-
-		//read frame
-
-		uint8_t frame[frame_length];
-		SDLNet_TCP_Recv(sd, frame, frame_length);
-		*/		
 
 		int frame_counter = SRDNet_get_frame_number();
 		int frame_length =  SRDNet_get_frame_length();
