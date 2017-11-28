@@ -101,7 +101,7 @@ public class Message {
 
     public byte[] toBytes() {
 
-        ByteBuffer bb = ByteBuffer.allocate(44);
+        ByteBuffer bb = ByteBuffer.allocate(48);
         bb.order(ByteOrder.LITTLE_ENDIAN);
         bb.putInt(type);
         bb.putInt(x);
@@ -121,7 +121,7 @@ public class Message {
 
     public ByteBuffer toByteBuffer() {
 
-        ByteBuffer bb = ByteBuffer.allocate(44);
+        ByteBuffer bb = ByteBuffer.allocate(48);
         bb.clear();
         bb.order(ByteOrder.LITTLE_ENDIAN);
         bb.putInt(type);
