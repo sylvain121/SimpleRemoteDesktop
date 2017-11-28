@@ -28,6 +28,7 @@ public class Message {
     private int codec_height = 0;
     private int bandwidth = 0;
     private int fps = 0;
+    private int sdl = 0; // always to 0 not a sdl client
 
     public void setType(int type) {
         this.type = type;
@@ -82,6 +83,7 @@ public class Message {
         message.codec_width = codec_width;
         message.codec_height = codec_height;
         message.bandwidth = bandwidth;
+	message.sdl = sdl;
 
         return message;
 
