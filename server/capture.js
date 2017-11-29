@@ -103,7 +103,7 @@ function getFrame() {
 			lb.writeInt32BE(frame.length);
 			frameNumberBuffer.writeInt32BE(frameCounter++);
 			socket.getSocket().write(frameNumberBuffer, function(){
-					console.log('sending frame number : '+frameCounter);
+					//console.log('sending frame number : '+frameCounter);
 					socket.getSocket().write(lb, function() {
 							socket.getSocket().write(frame, function() {
 									var t = new Date() - initTime;
