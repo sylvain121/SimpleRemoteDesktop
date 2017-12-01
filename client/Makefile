@@ -4,6 +4,8 @@ CFLAGS = -I$(CURRENT_DIR)/windows/include
 BINDIR = $(CURRENT_DIR)/windows/bin
 LDFLAGS = -L$(BINDIR)
 
+all : clean SDL2 SDL2_net ffmpeg client dist
+
 SDL2:
 	wget https://www.libsdl.org/release/SDL2-2.0.7.tar.gz
 	tar -zxvf SDL2-2.0.7.tar.gz
@@ -29,7 +31,7 @@ ffmpeg:
 	rm -Rf ffmpeg-3.4*
 
 client:
-	i686-w64-mingw32-gcc $(CFLAGS) $(LDFLAGS) -static-libgcc -static-libstdc++ -o $(shell pwd)/windows/bin/client.exe client.c -lavformat -lavcodec -lavutil -lswscale -lSDL2 -lSDL2_net
+	i686-w64-mingw32-gcc $(CFLAGS) $(LDFLAGS) -static-libgcc -static-libstdc++ -o $(shell pwd)/windows/bin/client.exe src/client.c -lavformat -lavcodec -lavutil -lswscale -lSDL2 -lSDL2_net
 
 clean:
 	rm -Rf windows
