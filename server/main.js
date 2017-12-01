@@ -1,9 +1,16 @@
-var capture = require('./capture');
+var videoCapture = require('./video/captureThread.js');
 var socket = require('./socket');
 var discovery = require("./DiscoveryService.js");
 
 socket.registerMessageHandler(onNewMessage);
-socket.registerdisconnectHander(capture.free);
+socket.registerdisconnectHander(videoCapture.free);
+
+const CONTROL_PORT = 8001;
+const DISCOVERY_PORT = 8002;
+const VIDEO_PORT = 8003;
+
+discovery.start(DISCOVERY_PORT);
+
 
 function onNewMessage(message) {
 
@@ -24,10 +31,10 @@ function onNewMessage(message) {
             capture.mouseToggle(message.button);
             break;
         case 6:
-            capture.start(message.width, message.height, message.codecWidth, message.codecHeight, message.bandwidth, message.fps, message.sdl);
+            videoCapture.start(message.codecWidth, message.codecHeight, message.bandwidth, message.fps, VIDEO_PORT);
             break;
         case 7:
-            capture.stop();
+            videoCapture.stop();
             break;
         default:
             break;
