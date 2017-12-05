@@ -57,7 +57,7 @@ void update_video_surface()
 			bmp,
 			NULL,
 			yPlane,
-			screen_width,
+			configuration->screen->width,
 			uPlane,
 			uvPitch,
 			vPlane,

@@ -32,13 +32,17 @@ int main(int argc, char *argv[])
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
 
 	// default value workaround
-
-	screen_width = 1280;
-	screen_height = 720;
-	codec_width = 800;
-	codec_height = 600;
-	bandwidth = 10000000;
-	fps = 25;
+	//
+	configuration = malloc(sizeof(Configuration));
+	configuration->screen = malloc(sizeof(Screen));
+	configuration->codec = malloc(sizeof(Codec));
+	configuration->server = malloc(sizeof(Server));
+	configuration->screen->width = 1280;
+	configuration->screen->height = 720;
+	configuration->codec->width = 800;
+	configuration->codec->height = 600;
+	configuration->bandwidth = 1000000;
+	configuration->fps = 25;
 
 	ctrl_press = false;
 	alt_press = false;
@@ -48,42 +52,44 @@ int main(int argc, char *argv[])
 
 	// parsing arguments
 
-	fprintf(stdout, "init() \n");
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, stdout, "init() \n");
 
-	hostname = strdup(argv[1]);
-	port = atoi(argv[2]);
-	video_definition = argv[3];
+	configuration->server->hostname = strdup(argv[1]);
+	configuration->server->port = atoi(argv[2]);
+	char *video_definition = argv[3];
 
 
 	if(argv[4] != NULL && atoi(argv[4]) > 0) // have custom bandwidth
 	{
-		bandwidth = atoi(argv[4]);
+		configuration->bandwidth = atoi(argv[4]);
 	}	
 
 	if(argv[4] != NULL && atoi(argv[5]) > 0) //have custom fps
 	{
-		fps = atoi(argv[5]); 
+		configuration->fps = atoi(argv[5]); 
 	}
 
-
-
-	printf("parameters hostname : %s, port : %d, video resolution : %s, bandwidth : %dKb, fps : %d \n", hostname, port, video_definition, bandwidth, fps);
-
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "parameters hostname : %s, port : %d, video resolution : %s, bandwidth : %dKb, fps : %d \n", 
+			configuration->server->hostname, 
+			configuration->server->port,
+			video_definition, 
+			configuration->bandwidth, 
+			configuration->fps);
 
 	if(video_definition != NULL)
 	{
 		if(strcmp("720p", video_definition) == 0)
 		{
-			codec_width = 1280;
-			codec_height = 720;
-			printf("swicth video resolution to %dx%d \n", codec_width, codec_height);
+			configuration->codec->width = 1280;
+			configuration->codec->height = 720;
+			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "swicth video resolution to %dx%d \n", configuration->codec->width, configuration->codec->height);
 		}  
 
 		if(strcmp("1080p", video_definition) == 0)
 		{
-			screen_width = codec_width = 1920;
-			screen_height = codec_height = 1080;
-			printf("swicth video resolution to %dx%d \n", codec_width, codec_height);
+			configuration->screen->width = configuration->codec->width = 1920;
+			configuration->screen->height = configuration->codec->height = 1080;
+			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "swicth video resolution to %dx%d \n", configuration->codec->width, configuration->codec->height);
 		} 
 	} 
 
@@ -91,24 +97,24 @@ int main(int argc, char *argv[])
 	// start SDL Application
 
 	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER)) {
-		fprintf(stderr, "Could not initialize SDL - %s\n", SDL_GetError());
-		exit(1);
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Could not initialize SDL - %s\n", SDL_GetError());
+		SRD_exit();
 	}
 
 	// init sdl surface
-	init_video_surface(screen_width, screen_height); //FIXME return status code
+	init_video_surface(configuration->screen->width, configuration->screen->height); //FIXME return status code
 
 	// init video decoder
-	init_video_decoder(codec_width, codec_height);
+	init_video_decoder(configuration->codec->width, configuration->codec->height);
 
 	//init network and send start packet
 	if(init_network()) 
 	{
-		// init network error
-		exit(1);
+		// TODO init network error
+		SRD_exit();
 	}
 
-	thread = SDL_CreateThread(video_thread, "video_thread", NULL);
+	thread = SDL_CreateThread(video_thread, "video_thread", configuration);
 	printf("start event loop\n "); //EVENT LOOP FOR CATCH INPUT EVENT //TODO REFACTOR
 	for(;;) {
 
@@ -123,8 +129,12 @@ int main(int argc, char *argv[])
 
 }
 
+void SRD_exit()
+{
+	exit(1);
+}
 
-int video_thread(void* data) 
+int video_thread(void* configuration) 
 {
 	while(quit == false)
 	{
@@ -141,7 +151,7 @@ int video_thread(void* data)
 
 
 		// decode frame from video_decoder
-		decode_video_frame(frame, frame_length); 
+		decode_video_frame(frame, frame_length, configuration); 
 		// update sdl texture with video_surface
 		update_video_surface(); 
 

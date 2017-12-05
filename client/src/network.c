@@ -12,8 +12,10 @@ int init_network()
 		return 0;
 	}
 
-	if(SDLNet_ResolveHost(&ip, hostname, port) < 0) {
-		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "unable to resolve address %s , port %s \n", &hostname, &port);
+	if(SDLNet_ResolveHost(&ip, configuration->server->hostname, configuration->server->port) < 0) {
+		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "unable to resolve address %s , port %s \n", 
+				configuration->server->hostname,
+			       	configuration->server->port);
 		return 0;
 	} 
 
@@ -24,12 +26,12 @@ int init_network()
 	// inital packet with information
 	struct Message init;
 	init.type = TYPE_ENCODER_START;
-	init.width = screen_width;
-	init.height = screen_height;
-	init.fps = fps;
-	init.codec_width = codec_width;
-	init.codec_height = codec_height;
-	init.bandwidth = bandwidth;
+	init.width = configuration->screen->width;
+	init.height = configuration->screen->height;
+	init.fps = configuration->fps;
+	init.codec_width = configuration->codec->width;
+	init.codec_height = configuration->codec->height;
+	init.bandwidth = configuration->bandwidth;
 	init.sdl = 1;
 
 

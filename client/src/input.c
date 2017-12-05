@@ -6,8 +6,8 @@
 
 void get_input_event()
 {
-    if(SDL_PollEvent(&userEvent)) {
-        
+    if(SDL_WaitEvent(&userEvent)) {
+		    SDL_Delay(10);    
                     struct Message send; 
         
                     switch(userEvent.type) {
@@ -120,7 +120,5 @@ void get_input_event()
                                            break;
                                        }
                     }
-    } else {
-	    SDL_Delay(1);
     }
 } 

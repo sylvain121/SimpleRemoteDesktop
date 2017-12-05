@@ -2,7 +2,6 @@
 
 #include "config.h"
 #include "video_decoder.h"
-#include "video_surface.h"
 
 // compatibility with newer API
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55,28,1)
@@ -71,7 +70,7 @@ int init_video_decoder(int codec_width, int codec_height, int fps)
 	return 1; // TODO
 }
 
-int decode_video_frame(uint8_t *frame,int frame_length) 
+int decode_video_frame(uint8_t *frame,int frame_length, Configuration *conf) 
 {
 
 
@@ -101,7 +100,7 @@ int decode_video_frame(uint8_t *frame,int frame_length)
 			pict.data[0] = yPlane;
 			pict.data[1] = uPlane;
 			pict.data[2] = vPlane;
-			pict.linesize[0] = screen_width;
+			pict.linesize[0] = conf->screen->width;
 			pict.linesize[1] = uvPitch;
 			pict.linesize[2] = uvPitch;		     
 

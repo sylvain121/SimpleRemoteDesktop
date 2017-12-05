@@ -1,11 +1,35 @@
-int screen_width;
-int screen_height;
-int codec_width;
-int codec_height;
-int bandwidth;
-int fps;
+typedef struct Screen Screen;
+struct Screen
+{
+	int width;
+	int height;
+};
 
-char* hostname; 
-int port; 
-char* video_definition; 
+typedef struct Codec Codec;
+struct Codec
+{
+	int width;
+	int height;
+};
 
+typedef struct Server Server;
+struct Server
+{
+	char * hostname;
+	int port;
+};
+
+typedef struct Configuration Configuration;
+struct Configuration
+{
+	Screen *screen;
+	Codec *codec;
+	Server *server;
+	int bandwidth;
+	int fps;
+};
+
+
+
+
+Configuration *configuration;
