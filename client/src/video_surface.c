@@ -17,7 +17,7 @@ void init_video_surface(int screen_width, int screen_height)
 
 	renderer = SDL_CreateRenderer(screen, -1, 0);
 	if (!renderer) {
-		fprintf(stderr, "SDL: could not create renderer - exiting\n");
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL: could not create renderer - exiting\n");
 		exit(1);
 
 	}
@@ -34,14 +34,13 @@ void init_video_surface(int screen_width, int screen_height)
 			);
 
 	// set up YV12 pixel array (12 bits per pixel)
-	printf("set up YV12 pixel array (12 bits per pixel)\n ");
 	yPlaneSz = screen_width * screen_height;
 	uvPlaneSz = screen_width * screen_height / 4;
 	yPlane = (Uint8*)malloc(yPlaneSz);
 	uPlane = (Uint8*)malloc(uvPlaneSz);
 	vPlane = (Uint8*)malloc(uvPlaneSz);
 	if (!yPlane || !uPlane || !vPlane) {
-		fprintf(stderr, "Could not allocate pixel buffers - exiting\n");
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Could not allocate pixel buffers - exiting\n");
 		exit(1);
 	}
 
