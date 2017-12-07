@@ -63,12 +63,12 @@ int main(int argc, char *argv[])
 
 
 	fprintf(stdout, "init() \n");
-	int screen_width = 1280;
-	int screen_height = 720;
+	int screen_width = 800;
+	int screen_height = 600;
 	int codec_width = 800;
 	int codec_height = 600;
-	int bandwidth = 10000000;
-	int fps = 25;
+	int bandwidth = 1000000;
+	int fps = 30;
 
 	char* hostname = strdup(argv[1]);
 
