@@ -158,6 +158,20 @@ public class Message {
 
         return message;
     }
+
+    public static Message keyDown(int key) {
+        Message message = new Message();
+        message.type = TYPE_KEY_DOWN;
+        message.keyCode = key;
+        return message;
+    }
+
+    public static Message keyUp(int key) {
+        Message message = new Message();
+        message.type = TYPE_KEY_UP;
+        message.keyCode = key;
+        return message;
+    }
 }
 
 

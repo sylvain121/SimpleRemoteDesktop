@@ -17,17 +17,21 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.github.sylvain121.SimpleRemoteDesktop.MainActivity;
+import com.github.sylvain121.SimpleRemoteDesktop.player.controllerAdapter.ControlAdapter;
+import com.github.sylvain121.SimpleRemoteDesktop.player.controllerAdapter.GamepadToMouseKeyboardAdapter;
+import com.github.sylvain121.SimpleRemoteDesktop.player.controllerAdapter.MultiButtonMouseButtonAdapter;
+import com.github.sylvain121.SimpleRemoteDesktop.player.controllerAdapter.SimpleTouchAdapter;
 import com.github.sylvain121.SimpleRemoteDesktop.player.video.MediaCodecDecoderRenderer;
 import com.github.sylvain121.SimpleRemoteDesktop.settings.SettingsActivity;
 
 public class PlayerActivity extends Activity implements SurfaceHolder.Callback, InputManager.InputDeviceListener {
 
-    private UserEventManager userEventManager;
     private String TAG = "PLAYER ACTIVITY";
     private String IPAddress;
     private boolean MouseIsPresent = false;
     private MediaCodecDecoderRenderer mediaCodec;
     private ConnectionThread cnx;
+    private ControlAdapter ctlAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,31 +49,9 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback, 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         SurfaceView sv = new SurfaceView(this);
         sv.getHolder().addCallback(this);
-        userEventManager = new UserEventManager();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(sv);
-        sv.setOnGenericMotionListener(new View.OnGenericMotionListener() {
-            @Override
-            public boolean onGenericMotion(View v, MotionEvent event) {
-                Log.d(TAG, "event : "+event.getButtonState());
-                return userEventManager.genericMouseHandler(event);
-
-            }
-        });
-
-        sv.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Log.d(TAG, "touch event : "+event.getButtonState());
-                if(event.getDevice().getSources() != InputDevice.SOURCE_MOUSE) {
-                    return userEventManager.onTouchHandler(event);
-                } else {
-                    return userEventManager.genericMouseHandler(event);
-                }
-
-            }
-        });
-
+        ctlAdapter = new GamepadToMouseKeyboardAdapter();
         Intent intent = getIntent();
         this.IPAddress = intent.getStringExtra(MainActivity.IP_ADDRESS);
 
@@ -89,6 +71,7 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback, 
         }
 
         Log.d(TAG, "width : "+width+ "height : "+height);
+        ctlAdapter.onSurfaceChange(width, height);
 
         SharedPreferences sharedPreference = getBaseContext().getSharedPreferences(SettingsActivity.SIMPLE_REMOTE_DESKTOP_PREF, 0);
 
@@ -136,13 +119,19 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback, 
 
     @Override
     public boolean dispatchGenericMotionEvent(MotionEvent event) {
-        Log.d("TEST", event.toString());
-        return true;
+        Log.d(TAG, event.toString());
+        return ctlAdapter.onGenericMotion(event);
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        Log.d("TEST", event.toString());
-        return true;
+        Log.d(TAG, event.toString());
+        return ctlAdapter.onGenericKeyEvent(event);
+    }
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        Log.d(TAG, event.toString());
+        return ctlAdapter.onGenericTouchEvent(event);
+
     }
 }
