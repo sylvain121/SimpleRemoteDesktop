@@ -31,7 +31,7 @@ module.exports.SDLKeyToKeySym_init = function() {
     // (0x5b) bracketleft, backslash, bracketright, asciicircum/caret,
     // (0x5f) underscore, grave
     // (0x61-7a) a-z
-    for (i = 0x20; i <= 0x7a; i++) {
+    for (i = 0x20; i <= 0xFF; i++) {
         keymap[i] = i;
     }
     keymap['\177'.charCodeAt(0)] = 0xffff; //		= 127,

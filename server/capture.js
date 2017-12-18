@@ -174,7 +174,8 @@ module.exports.toggleKeyDown = function(keyCode) {
 	if (running) {
 		if (keyCode <= 0) return console.log("unknow keyCode : " + keyCode);
 		if(options.sdl === 1) keyCode = SDLKey.SDLKeyToKeySym(keyCode);
-		x11.keyPressWithKeysym(keyCode, true);
+		//console.log("Keycode : "+keyCode+" down");
+		x11.keyPressWithKeysym(parseInt(keyCode,10), true);
 	};
 }
 
@@ -183,6 +184,16 @@ module.exports.toggleKeyUp = function(keyCode) {
 	if (running) {
 		if (keyCode <= 0) return console.log("unknow keyCode : " + keyCode);
 		if(options.sdl === 1) keyCode = SDLKey.SDLKeyToKeySym(keyCode);
-		x11.keyPressWithKeysym(keyCode, false);
+		//console.log("Keycode : "+keyCode+" up");
+		x11.keyPressWithKeysym(parseInt(keyCode,10), false);
 	}
+}
+
+function keypress(keycode, isDown) {
+	if (running) {
+		if (keyCode <= 0) return console.log("unknow keyCode : " + keyCode);
+		if(options.sdl === 1) keyCode = SDLKey.SDLKeyToKeySym(keyCode);
+		//console.log("Keycode : "+keyCode+" down");
+		if( keycode !== undefined) x11.keyPressWithKeysym(parseInt(keyCode,10), isDown);
+	};
 }
