@@ -2,10 +2,7 @@ const x11 = require("node-x11");
 const encoder = require('node-avcodec-h264-encoder');
 const net = require('net');
 
-var lb = Buffer.allocUnsafe(4);
 var running = false;
-var frameNumberBuffer = Buffer.allocUnsafe(4);
-var frameCounter = 0;
 var socket = null;
 
 var options = {
@@ -15,8 +12,7 @@ var options = {
 	outputHeight: 0,
 	bit_rate: 1000000,
 	fps: 30,
-	sample: encoder.YUV_420P,
-	port: 8003
+	sample: encoder.YUV_420P
 };
 
 module.exports.free = free;
@@ -41,7 +37,7 @@ function free() {
 }
 
 
-module.exports.start = function(codecWidth, codecHeight, bandwidth, fps, tcp_port) {
+module.exports.start = function(codecWidth, codecHeight, bandwidth, fps, videoCallback) {
 
 	console.log("Starting new capture session");
 	options.outputWidth = codecWidth;
@@ -49,8 +45,6 @@ module.exports.start = function(codecWidth, codecHeight, bandwidth, fps, tcp_por
 	options.bit_rate = bandwidth;
 	options.fps = fps;
 	options.period = 1000 / options.fps;
-	options.port = tcp_port;
-	frameCounter = 0;
 	getFrame();
 }
 
@@ -87,52 +81,10 @@ function getFrame() {
 	if (frame !== undefined) {
 		frameSend = false;
 		var frameTime = new Date();
-
-		if (socket == null) {
-			free();
-		} else {
-
-			lb.writeInt32BE(frame.length);
-			frameNumberBuffer.writeInt32BE(frameCounter++);
-			socket.write(frameNumberBuffer, function(){
-				//console.log('sending frame number : '+frameCounter);
-				socket.write(lb, function() {
-					socket.write(frame, function() {
-						var t = new Date() - initTime;
-						if(running) {
-							setTimeout(getFrame, options.period - t);
-						}
-					});
-				});
-			});
-
-
-
+		var t = new Date() - initTime;
+		if(running) {
+			setTimeout(getFrame, options.period - t);
 		}
 	}
-}
 
 
-function startSocket() {
-	var server = net.createServer(function(s) {
-		console.log("new socket connected");
-		socket = s;
-		s.on('close', function() {
-			console.log("Socket Disconnected");
-			socket = null;	
-			free();
-		})
-			.on('data', function(data) {
-				// Do nothing acctualy
-				// eventually can receive request idr frame
-			})
-			.on('error', function() {
-				console.log("error on socket");
-				free();
-			});
-
-
-	});
-
-
-}

@@ -2,14 +2,13 @@ const { fork } = require('child_process');
 const videoProc = fork('./captureRunnable');
 
 
-module.exports.start = function(codecWidth, codecHeight, bandwidth, fps, tcp_port) {
+module.exports.start = function(codecWidth, codecHeight, bandwidth, fps) {
 	videoProc.send({
 		type: "start",
 		codecWidth: codecWidth,
 		codecHeight: codecHeight,
 		bandwidth: bandwidth,
-		fps: fps,
-		tcp_port: tcp_port
+		fps: fps
 	});
 }
 
@@ -18,6 +17,6 @@ module.exports.stop = function() {
 }
 
 
-videoProc.on('message', (m)=>{
- //TODO implements ?
+videoProc.on('message', (frame)=>{
+// to video buffer fifo
 });
