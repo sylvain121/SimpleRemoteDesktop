@@ -7,10 +7,10 @@
   "email": "",
   "license": "GPL-3.0",
   "dependencies": {
-    "node-avcodec-h264-encoder": "git+https://github.com/sylvain121/node-avcodec-h264-encoder.git#7b5135e1421836bd348cf1ea8fd8c20e62933ea3",
     "express": "^4.16.2",
     "lodash": "^4.17.4",
     "netmask": "^1.0.6",
-    "node-x11": "git+https://github.com/sylvain121/node-X11.git"
+    "node-avcodec-h264-encoder": "git+https://git@github.com/sylvain121/node-avcodec-h264-encoder.git#7b5135e1421836bd348cf1ea8fd8c20e62933ea3",
+    "node-x11": "github:sylvain121/node-X11"
   }
 }
