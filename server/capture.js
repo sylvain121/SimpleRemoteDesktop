@@ -2,6 +2,7 @@ const x11 = require("node-x11");
 const encoder = require('node-avcodec-h264-encoder');
 const socket = require("./socket");
 const SDLKey = require('./SDLKeysymToX11Keysym');
+const keyLoger = require('./keyLoger');
 
 var lb = Buffer.allocUnsafe(4);
 var running = false;
@@ -39,6 +40,10 @@ function free() {
 	running = false;
 	freeDesktop();
 	freeEncoder();
+	keyLoger.reset(x11.keyPressWithKeysym, function(){
+		x11.mouseButton(1, false);
+		x11.mouseButton(2, false);
+	})
 
 }
 
@@ -175,6 +180,7 @@ module.exports.toggleKeyDown = function(keyCode) {
 		if (keyCode <= 0) return console.log("unknow keyCode : " + keyCode);
 		if(options.sdl === 1) keyCode = SDLKey.SDLKeyToKeySym(keyCode);
 		//console.log("Keycode : "+keyCode+" down");
+		keyLoger.logKeyDown(keyCode);
 		x11.keyPressWithKeysym(parseInt(keyCode,10), true);
 	};
 }
