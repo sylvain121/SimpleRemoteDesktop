@@ -1,16 +1,21 @@
 {
-  "name": "StreamMyDesktopServer",
+  "name": "simpleremotedesktopserver",
   "version": "1.0.0",
+  "description": "linux desktrop streaming server",
   "main": "main.js",
-  "description": "",
-  "author": "sylvain121",
-  "email": "",
-  "license": "GPL-3.0",
   "dependencies": {
-    "node-avcodec-h264-encoder": "git+https://github.com/sylvain121/node-avcodec-h264-encoder.git#7b5135e1421836bd348cf1ea8fd8c20e62933ea3",
+    "bunyan": "^1.8.12",
     "express": "^4.16.2",
     "lodash": "^4.17.4",
     "netmask": "^1.0.6",
+    "node-avcodec-h264-encoder": "git+https://github.com/sylvain121/node-avcodec-h264-encoder.git#7b5135e1421836bd348cf1ea8fd8c20e62933ea3",
     "node-x11": "git+https://github.com/sylvain121/node-X11.git"
-  }
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node main.js | ./node_modules/.bin/bunyan"
+  },
+  "author": "sylvain121",
+  "license": "ISC"
 }

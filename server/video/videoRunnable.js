@@ -1,18 +1,22 @@
-const {start, stop } = require('./capture.js');
+const {start, stop, videoCaptureEventEmitter } = require('./capture.js');
+const { log } = require('../logger.js');
 
 process.on('message', (m)=>{
-
-	switch(m){
+	log.debug("new message from main thread for video");
+	log.debug(m);
+	switch(m.type){
 		case "start":
-			start(m.codecWidth, m.codecHeight, m.bandwidth, m.fpsi, videoCallback);
+			start(m.codecWidth, m.codecHeight, m.bandwidth, m.fps);
 			break;
 		case "stop":
 			stop();
+			break;
 	}
 });
 
-function videoCallback(frame) {
- process.send(frame);
-}
+videoCaptureEventEmitter.on('frame', (frame) => {
+log.debug("sending frame to main process");	
+	process.send(frame)
+});
 
-// process.send({ foo: 'bar', baz: NaN  });
+

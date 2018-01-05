@@ -1,9 +1,14 @@
 const x11 = require("node-x11");
 const encoder = require('node-avcodec-h264-encoder');
-const net = require('net');
-
+const { log } = require('../logger.js');
 var running = false;
-var socket = null;
+
+const EventEmitter = require('events');
+class VideoCaptureEvent extends EventEmitter {}
+const videoCaptureEventEmitter = new VideoCaptureEvent();
+
+module.exports.videoCaptureEventEmitter = videoCaptureEventEmitter;
+
 
 var options = {
 	inputWidth: 0,
@@ -18,18 +23,19 @@ var options = {
 module.exports.free = free;
 
 function freeDesktop() {
-	console.log( "freeing desktop capture" );
+	log.info( "freeing desktop capture" );
 	var x11ModuleName = require.resolve("node-x11");
 	delete require.cache[x11ModuleName];
 }
 
 function freeEncoder() {
-	console.log("freeing encoder");
+	log.info("freeing encoder");
 	var encoderModuleName = require.resolve('node-avcodec-h264-encoder');
 	delete require.cache[encoderModuleName];
 }
 
 function free() {
+	log.info("stopping capture thread");
 	running = false;
 	freeDesktop();
 	freeEncoder();
@@ -37,14 +43,24 @@ function free() {
 }
 
 
-module.exports.start = function(codecWidth, codecHeight, bandwidth, fps, videoCallback) {
+module.exports.start = function(codecWidth, codecHeight, bandwidth, fps) {
 
-	console.log("Starting new capture session");
 	options.outputWidth = codecWidth;
 	options.outputHeight = codecHeight;
 	options.bit_rate = bandwidth;
 	options.fps = fps;
 	options.period = 1000 / options.fps;
+	log.info("Starting new capture session");
+	log.debug(options);
+
+	x11.init();
+	var img = x11.getImage();
+	options.inputWidth = img.width;
+	options.inputHeight = img.height;
+	encoder.initSync(options);
+	running = true;
+
+
 	getFrame();
 }
 
@@ -55,36 +71,18 @@ module.exports.stop = function() {
 
 
 function getFrame() {
+	log.debug("requesting new frame");
 	var initTime = new Date();
-	if (!running) {
-		x11.init();
-	}
-
 	var img = x11.getImage();
-
-	if (options.inputWidth !== img.width || options.inputHeight !== img.height) {
-		console.log("resolution changed : reconfiguring encoder");
-		freeEncoder();
-		running = false;
-	}
-	if (!running) {
-		options.inputWidth = img.width;
-		options.inputHeight = img.height;
-		console.log("init video stream");
-		console.log(options);
-		encoder.initSync(options);
-		running = true;
-	}
-
 	var frame = encoder.encodeFrameSync(img.data);
 
 	if (frame !== undefined) {
-		frameSend = false;
+		videoCaptureEventEmitter.emit('frame', frame);
 		var frameTime = new Date();
 		var t = new Date() - initTime;
 		if(running) {
 			setTimeout(getFrame, options.period - t);
 		}
 	}
-
+}
 

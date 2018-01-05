@@ -1,8 +1,14 @@
 const { fork } = require('child_process');
-const videoProc = fork('./captureRunnable');
-
+const videoProc = fork('./video/videoRunnable');
+const { log } = require('../logger.js');
+module.exports.registerFrameCallBack = (cb) => {
+	videoProc.on('message', (frame)=>{
+		cb(frame);	
+	});
+}
 
 module.exports.start = function(codecWidth, codecHeight, bandwidth, fps) {
+	log.debug("sending start request to video capture thread");
 	videoProc.send({
 		type: "start",
 		codecWidth: codecWidth,
@@ -16,7 +22,3 @@ module.exports.stop = function() {
 	videoProc.send({type: "stop"});
 }
 
-
-videoProc.on('message', (frame)=>{
-// to video buffer fifo
-});
