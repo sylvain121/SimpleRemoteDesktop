@@ -27,6 +27,16 @@ int video_thread(void* data);
 
 int main(int argc, char *argv[]) 
 {
+
+	int i;
+
+	// Declare display mode structure to be filled in.
+	SDL_DisplayMode current;
+
+
+
+
+
 	// set log level
 
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
@@ -37,8 +47,8 @@ int main(int argc, char *argv[])
 	configuration->screen = malloc(sizeof(Screen));
 	configuration->codec = malloc(sizeof(Codec));
 	configuration->server = malloc(sizeof(Server));
-	configuration->screen->width = 1280;
-	configuration->screen->height = 720;
+	configuration->screen->width = 800;
+	configuration->screen->height = 600;
 	configuration->codec->width = 800;
 	configuration->codec->height = 600;
 	configuration->bandwidth = 1000000;
@@ -83,7 +93,13 @@ int main(int argc, char *argv[])
 			configuration->codec->width = 1280;
 			configuration->codec->height = 720;
 			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "swicth video resolution to %dx%d \n", configuration->codec->width, configuration->codec->height);
-		}  
+		}
+		if(strcmp("800p", video_definition) == 0)
+		{
+			configuration->codec->width = 1280;
+			configuration->codec->height = 800;
+			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "swicth video resolution to %dx%d \n", configuration->codec->width, configuration->codec->height);
+		} 
 
 		if(strcmp("1080p", video_definition) == 0)
 		{
@@ -100,6 +116,7 @@ int main(int argc, char *argv[])
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Could not initialize SDL - %s\n", SDL_GetError());
 		SRD_exit();
 	}
+
 
 	// init sdl surface
 	init_video_surface(configuration->screen->width, configuration->screen->height); //FIXME return status code
