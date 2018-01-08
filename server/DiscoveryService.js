@@ -7,7 +7,7 @@ var dgram = require('dgram');
 var server = dgram.createSocket("udp4");
 var message = new Buffer(os.hostname()+";"+os.platform());
 var interval = null;
-
+const { log } = require('./logger.js');
 
 var broadcastAddressArray = [];
 var netInterface  = os.networkInterfaces();
@@ -36,7 +36,7 @@ module.exports.start = function(PORT) {
 	function broadcastNew() {
 		broadcastAddressArray.forEach(function(address){
 			server.send(message, 0, message.length, PORT, address,  function() {
-				//			console.log("Sent '" + message + "'");
+				log.debug("Discovery service : Sent '" + message + "'");
 
 			});
 

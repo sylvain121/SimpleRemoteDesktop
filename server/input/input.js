@@ -66,7 +66,7 @@ function mouseMove(x, y) {
 function mouseToggle(button, newStat) {
 		var isDown = false;
 		isDown = (newStat === "down") ? true : false;
-		console.log("button id : "+button+" isDown ? : "+isDown);
+		log.trace("button id : "+button+" isDown ? : "+isDown);
 		x11.mouseButton(button, isDown);
 }
 
@@ -79,14 +79,14 @@ function mouseToggle(button, newStat) {
 
 
 function toggleKeyDown(keyCode) {
-		if (keyCode <= 0) return console.log("unknow keyCode : " + keyCode);
+		if (keyCode <= 0) return log.warn("unknow keyCode : " + keyCode);
 		if(sdl) keyCode = SDLKey.SDLKeyToKeySym(keyCode);
 		x11.keyPressWithKeysym(keyCode, true);
 }
 
 
 function toggleKeyUp(keyCode) {
-		if (keyCode <= 0) return console.log("unknow keyCode : " + keyCode);
+		if (keyCode <= 0) return log.warn("unknow keyCode : " + keyCode);
 		if(sdl) keyCode = SDLKey.SDLKeyToKeySym(keyCode);
 		x11.keyPressWithKeysym(keyCode, false);
 }
