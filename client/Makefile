@@ -31,7 +31,7 @@ ffmpeg:
 	rm -Rf ffmpeg-3.4*
 
 client:
-	i686-w64-mingw32-gcc $(CFLAGS) $(LDFLAGS) -static-libgcc -static-libstdc++ -o $(shell pwd)/windows/bin/client.exe src/client.c -lavformat -lavcodec -lavutil -lswscale -lSDL2 -lSDL2_net
+	i686-w64-mingw32-gcc $(CFLAGS) $(LDFLAGS) -static-libgcc -static-libstdc++ -o $(shell pwd)/windows/bin/client.exe src/*.c -lavformat -lavcodec -lavutil -lswscale -lSDL2 -lSDL2_net
 
 clean:
 	rm -Rf windows
