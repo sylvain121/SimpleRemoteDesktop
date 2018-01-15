@@ -23,6 +23,7 @@ typedef struct Configuration Configuration;
 struct Configuration
 {
 	Screen *screen;
+	Screen *maxScreenSize;
 	Codec *codec;
 	Server *server;
 	int bandwidth;

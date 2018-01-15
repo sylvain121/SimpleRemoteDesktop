@@ -47,7 +47,10 @@ int main(int argc, char *argv[])
 	configuration->screen = malloc(sizeof(Screen));
 	configuration->codec = malloc(sizeof(Codec));
 	configuration->server = malloc(sizeof(Server));
+	configuration->maxScreenSize = malloc(sizeof(Screen));
 	configuration->screen->width = 800;
+	configuration->maxScreenSize->height = 600;
+	configuration->maxScreenSize->width = 800;
 	configuration->screen->height = 600;
 	configuration->codec->width = 800;
 	configuration->codec->height = 600;
@@ -116,7 +119,12 @@ int main(int argc, char *argv[])
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Could not initialize SDL - %s\n", SDL_GetError());
 		SRD_exit();
 	}
-
+	
+	if(SDL_GetCurrentDisplayMode(0, &current))
+	{
+		configuration->maxScreenSize->width = current.w;
+		configuration->maxScreenSize->height = current.h;
+	}
 
 	// init sdl surface
 	init_video_surface(configuration->screen->width, configuration->screen->height); //FIXME return status code

@@ -64,8 +64,8 @@ void get_input_event()
                         case SDL_MOUSEMOTION: 
                             //printf("mouse position x: %d, y: %d \n", userEvent.motion.x, userEvent.motion.y);
                             send.type = TYPE_MOUSE_MOTION;
-                            send.x = (int) userEvent.motion.x;
-                            send.y = (int) userEvent.motion.y;
+                            send.x =  ( (double) userEvent.motion.x / (double) configuration->maxScreenSize->width);
+                            send.y = ( (double) userEvent.motion.y / (double) configuration->maxScreenSize->height);
                             SDLNet_TCP_Send(control_socket, (void * )&send, sizeof(send));
                             break;
                         case SDL_MOUSEBUTTONDOWN: {
