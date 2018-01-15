@@ -70,3 +70,11 @@ void update_video_surface()
 
 
 }
+void SRD_UpdateScreenResolution() 
+{
+	int w, h;
+	SDL_GetRendererOutputSize(renderer,&w, &h);
+	configuration->screen->width = w;
+	configuration->screen->height = h;
+
+}

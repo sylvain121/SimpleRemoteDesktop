@@ -30,12 +30,15 @@ void get_input_event()
                                 if(screen_is_fullscreen) 
                                 {
                                     screen_is_fullscreen = false;
-                                    SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN_DESKTOP);						
+                                    SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN_DESKTOP);
+				    SRD_UpdateScreenResolution();
+									    
                                 } 
                                 else
                                 {
                                     screen_is_fullscreen = true;
                                     SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN);
+				   SRD_UpdateScreenResolution();
                                 } 
         
                             } else {
@@ -64,8 +67,8 @@ void get_input_event()
                         case SDL_MOUSEMOTION: 
                             //printf("mouse position x: %d, y: %d \n", userEvent.motion.x, userEvent.motion.y);
                             send.type = TYPE_MOUSE_MOTION;
-                            send.x =  ( (double) userEvent.motion.x / (double) configuration->maxScreenSize->width);
-                            send.y = ( (double) userEvent.motion.y / (double) configuration->maxScreenSize->height);
+                            send.x =  ( (float) userEvent.motion.x / (float) configuration->screen->width);
+                            send.y = ( (float) userEvent.motion.y / (float) configuration->screen->height);
                             SDLNet_TCP_Send(control_socket, (void * )&send, sizeof(send));
                             break;
                         case SDL_MOUSEBUTTONDOWN: {

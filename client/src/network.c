@@ -26,8 +26,10 @@ int init_network()
 	// inital packet with information
 	struct Message init;
 	init.type = TYPE_ENCODER_START;
-	init.width = configuration->screen->width;
-	init.height = configuration->screen->height;
+	init.x = 1;
+	init.y = 1;
+	init.button = 1;
+	init.keycode = 1;
 	init.fps = configuration->fps;
 	init.codec_width = configuration->codec->width;
 	init.codec_height = configuration->codec->height;
@@ -35,6 +37,7 @@ int init_network()
 	init.sdl = 1;
 
 
+	SDL_LogVerbose(SDL_LOG_CATEGORY_APPLICATION, "sending init frame : type: %d, fps: %d, codec width: %d, codec height: %d, bandwidth: %d", init.type, init.fps, init.codec_width, init.codec_height, init.bandwidth);
 	SDLNet_TCP_Send(control_socket, (void * )&init, sizeof(init));
 	return 0;
 }

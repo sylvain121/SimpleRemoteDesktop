@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 
 	// set log level
 
-	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
+	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
 
 	// default value workaround
 	//
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 		configuration->fps = atoi(argv[5]); 
 	}
 
-	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "parameters hostname : %s, port : %d, video resolution : %s, bandwidth : %dKb, fps : %d \n", 
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "parameters hostname : %s, port : %d, video resolution : %s, bandwidth : %d, fps : %d \n", 
 			configuration->server->hostname, 
 			configuration->server->port,
 			video_definition, 
@@ -93,14 +93,14 @@ int main(int argc, char *argv[])
 	{
 		if(strcmp("720p", video_definition) == 0)
 		{
-			configuration->codec->width = 1280;
-			configuration->codec->height = 720;
+		 	configuration->screen->width = configuration->codec->width = 1280;
+			configuration->screen->height = configuration->codec->height = 720;
 			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "swicth video resolution to %dx%d \n", configuration->codec->width, configuration->codec->height);
 		}
 		if(strcmp("800p", video_definition) == 0)
 		{
-			configuration->codec->width = 1280;
-			configuration->codec->height = 800;
+			configuration->screen->width = configuration->codec->width = 1280;
+			configuration->screen->height = configuration->codec->height = 800;
 			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "swicth video resolution to %dx%d \n", configuration->codec->width, configuration->codec->height);
 		} 
 
@@ -120,10 +120,15 @@ int main(int argc, char *argv[])
 		SRD_exit();
 	}
 	
-	if(SDL_GetCurrentDisplayMode(0, &current))
-	{
+	int should_be_zero = SDL_GetCurrentDisplayMode(0, &current);
+
+	if(should_be_zero != 0 ){
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Could not get Current display resolution %s", SDL_GetError());
+	}else {
 		configuration->maxScreenSize->width = current.w;
 		configuration->maxScreenSize->height = current.h;
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "max screen resolution, width : %d, height: %d",configuration->maxScreenSize->width, configuration->maxScreenSize->height);
+
 	}
 
 	// init sdl surface
@@ -172,7 +177,7 @@ int video_thread(void* configuration)
 		SRD_ensure(frame_length);
 		uint8_t *frame = SRD_read(frame_length);
 
-		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "frame number : %d, frame size : %d", frame_counter, frame_length);
+		SDL_LogVerbose(SDL_LOG_CATEGORY_APPLICATION, "frame number : %d, frame size : %d", frame_counter, frame_length);
 
 
 		// decode frame from video_decoder

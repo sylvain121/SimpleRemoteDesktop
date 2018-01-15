@@ -6,7 +6,7 @@ client application based on sdl2
 
 ubuntu package : 
 ```bash
-sudo apt-get install build-essentials libavutil-dev libavcodec-dev libswscale-dev libx264-dev libsdl2-dev libsdl2-net-dev
+sudo apt-get install build-essential libavutil-dev libavcodec-dev libswscale-dev libx264-dev libsdl2-dev libsdl2-net-dev libavformat-dev
 ```
 windows : 
 ```bash

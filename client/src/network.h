@@ -25,8 +25,8 @@ enum type {TYPE_KEY_DOWN=1, TYPE_KEY_UP=2, TYPE_MOUSE_MOTION=3, TYPE_MOUSE_DOWN=
 struct Message
 {
 	int type;
-	double x;
-	double y;
+	float x;
+	float y;
 	int button;
 	int keycode;
 	int codec_width;
