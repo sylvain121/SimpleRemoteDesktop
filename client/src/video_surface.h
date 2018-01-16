@@ -3,7 +3,6 @@
 SDL_Window     *screen;
 SDL_Texture   *bmp;
 SDL_Renderer *renderer;
-SDL_Rect        rect;
 SDL_Event       event;
 
 

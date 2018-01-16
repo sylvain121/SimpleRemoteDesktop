@@ -74,6 +74,7 @@ void SRD_UpdateScreenResolution()
 {
 	int w, h;
 	SDL_GetRendererOutputSize(renderer,&w, &h);
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "set screen size to width : %d, height : %d", w, h);
 	configuration->screen->width = w;
 	configuration->screen->height = h;
 
