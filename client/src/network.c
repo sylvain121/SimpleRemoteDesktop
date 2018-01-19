@@ -23,6 +23,11 @@ int init_network()
 		 SDL_LogError(SDL_LOG_CATEGORY_ERROR,"SDLNet_TCP_Open: %s\n", SDLNet_GetError());
 		return 0;
 	}
+	return 0;
+}
+
+int SRDNet_send_start_packet() 
+{
 	// inital packet with information
 	struct Message init;
 	init.type = TYPE_ENCODER_START;
@@ -35,11 +40,20 @@ int init_network()
 	init.codec_height = configuration->codec->height;
 	init.bandwidth = configuration->bandwidth;
 	init.sdl = 1;
-
-
 	SDL_LogVerbose(SDL_LOG_CATEGORY_APPLICATION, "sending init frame : type: %d, fps: %d, codec width: %d, codec height: %d, bandwidth: %d", init.type, init.fps, init.codec_width, init.codec_height, init.bandwidth);
 	SDLNet_TCP_Send(control_socket, (void * )&init, sizeof(init));
 	return 0;
+
+}
+
+int SRDNet_send_stop_packet() 
+{
+	struct Message stop;
+	stop.type = TYPE_ENCODER_STOP;
+	SDL_LogVerbose(SDL_LOG_CATEGORY_APPLICATION, "sending stop frame"); 
+	SDLNet_TCP_Send(control_socket, (void * )&stop, sizeof(stop));
+	return 0;
+
 }
 
 int SRDNet_get_frame_number()

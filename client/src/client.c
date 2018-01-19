@@ -143,6 +143,8 @@ int main(int argc, char *argv[])
 		// TODO init network error
 		SRD_exit();
 	}
+	// send init packet
+	SRDNet_send_start_packet();
 
 	thread = SDL_CreateThread(video_thread, "video_thread", configuration);
 	printf("start event loop\n "); //EVENT LOOP FOR CATCH INPUT EVENT //TODO REFACTOR

@@ -48,3 +48,5 @@ int SRDNet_get_frame_length();
 void SRD_ensure(int nbytes);
 int SRD_readUInt32();
 uint8_t * SRD_read(int nbytes);
+int SRDNet_send_start_packet(); 
+int SRDNet_send_stop_packet();
