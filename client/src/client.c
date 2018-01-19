@@ -24,7 +24,7 @@
 
 SDL_Thread *thread = NULL;
 int video_thread(void* data); 
-void SRD_init();
+void SRD_init_renderer();
 void SRD_close();
 
 
@@ -65,7 +65,6 @@ int main(int argc, char *argv[])
 	alt_press = false;
 	quit = false;
 	screen_is_fullscreen = 0;
-
 
 	// parsing arguments
 
@@ -135,9 +134,18 @@ int main(int argc, char *argv[])
 
 	}
 
-	SRD_init();
-
+	init_video(configuration->screen->width, configuration->screen->height); //FIXME return status code
 	thread = SDL_CreateThread(video_thread, "video_thread", configuration);
+
+	//init network and send start packet
+	if(init_network()) 
+	{
+		// TODO init network error
+		SRD_exit();
+	}
+	// send init packet
+	SRDNet_send_start_packet();
+
 	printf("start event loop\n "); //EVENT LOOP FOR CATCH INPUT EVENT //TODO REFACTOR
 	for(;;) {
 
@@ -152,28 +160,18 @@ int main(int argc, char *argv[])
 
 }
 
-void SRD_init()
+void SRD_init_renderer(Configuration* configuration)
 {
-	// init sdl surface
-	init_video(configuration->screen->width, configuration->screen->height); //FIXME return status code
 	SRD_init_renderer_texture(configuration->screen->width, configuration->screen->height);
-
-	// init video decoder
 	init_video_decoder(configuration->codec->width, configuration->codec->height);
 
-	//init network and send start packet
-	if(init_network()) 
-	{
-		// TODO init network error
-		SRD_exit();
-	}
-	// send init packet
-	SRDNet_send_start_packet();
+
 }
 
-void SRD_close()
+void SRD_close_renderer(Configuration* configuration)
 {
-
+	destroy_decoder();
+	destroy_texture();
 }
 
 void SRD_exit()
@@ -183,7 +181,9 @@ void SRD_exit()
 
 int video_thread(void* configuration) 
 {
-	while(quit == false)
+	SRD_init_renderer(configuration);
+
+	while(close_video_thread == false)
 	{
 		av_init_packet(&packet);
 
@@ -203,6 +203,8 @@ int video_thread(void* configuration)
 		update_video_surface(); 
 
 	}
+
+	SRD_close_renderer(configuration);
 }
 
 
