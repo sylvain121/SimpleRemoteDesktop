@@ -70,6 +70,13 @@ int init_video_decoder(int codec_width, int codec_height, int fps)
 	return 1; // TODO
 }
 
+void destroy_decoder()
+{
+	avcodec_close(pCodecCtx);
+	av_free(pCodecCtx);
+	sws_freeContext(sws_ctx);
+}
+
 int decode_video_frame(uint8_t *frame,int frame_length, Configuration *conf) 
 {
 

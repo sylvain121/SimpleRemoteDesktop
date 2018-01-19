@@ -22,4 +22,4 @@ int uvPitch;
 
 int init_video_decoder();
 int decode_video_frame(uint8_t *frame,int frame_length, Configuration *conf); 
-
+void destroy_decoder();

@@ -24,6 +24,10 @@
 
 SDL_Thread *thread = NULL;
 int video_thread(void* data); 
+void SRD_init();
+void SRD_close();
+
+
 
 int main(int argc, char *argv[]) 
 {
@@ -93,7 +97,7 @@ int main(int argc, char *argv[])
 	{
 		if(strcmp("720p", video_definition) == 0)
 		{
-		 	configuration->screen->width = configuration->codec->width = 1280;
+			configuration->screen->width = configuration->codec->width = 1280;
 			configuration->screen->height = configuration->codec->height = 720;
 			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "swicth video resolution to %dx%d \n", configuration->codec->width, configuration->codec->height);
 		}
@@ -119,7 +123,7 @@ int main(int argc, char *argv[])
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Could not initialize SDL - %s\n", SDL_GetError());
 		SRD_exit();
 	}
-	
+
 	int should_be_zero = SDL_GetCurrentDisplayMode(0, &current);
 
 	if(should_be_zero != 0 ){
@@ -131,20 +135,7 @@ int main(int argc, char *argv[])
 
 	}
 
-	// init sdl surface
-	init_video_surface(configuration->screen->width, configuration->screen->height); //FIXME return status code
-
-	// init video decoder
-	init_video_decoder(configuration->codec->width, configuration->codec->height);
-
-	//init network and send start packet
-	if(init_network()) 
-	{
-		// TODO init network error
-		SRD_exit();
-	}
-	// send init packet
-	SRDNet_send_start_packet();
+	SRD_init();
 
 	thread = SDL_CreateThread(video_thread, "video_thread", configuration);
 	printf("start event loop\n "); //EVENT LOOP FOR CATCH INPUT EVENT //TODO REFACTOR
@@ -158,6 +149,30 @@ int main(int argc, char *argv[])
 			break;
 	}
 	return 0;
+
+}
+
+void SRD_init()
+{
+	// init sdl surface
+	init_video(configuration->screen->width, configuration->screen->height); //FIXME return status code
+	SRD_init_renderer_texture(configuration->screen->width, configuration->screen->height);
+
+	// init video decoder
+	init_video_decoder(configuration->codec->width, configuration->codec->height);
+
+	//init network and send start packet
+	if(init_network()) 
+	{
+		// TODO init network error
+		SRD_exit();
+	}
+	// send init packet
+	SRDNet_send_start_packet();
+}
+
+void SRD_close()
+{
 
 }
 

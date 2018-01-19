@@ -2,10 +2,9 @@
 #include "video_surface.h"
 #include "video_decoder.h"
 
-void init_video_surface(int screen_width, int screen_height)
+void init_video(int screen_width, int screen_height)
 {
 	// Make a screen to put our video
-	printf("Make a screen to put our video \n");
 	screen = SDL_CreateWindow(
 			"StreamMyDesktop Client",
 			SDL_WINDOWPOS_UNDEFINED,
@@ -22,9 +21,11 @@ void init_video_surface(int screen_width, int screen_height)
 
 	}
 
-	// Allocate a place to put our YUV image on that screen
 
-	printf("Allocate a place to put our YUV image on that screen\n ");
+}
+
+void SRD_init_renderer_texture(int screen_width, int screen_height)
+{
 	bmp = SDL_CreateTexture(
 			renderer,
 			SDL_PIXELFORMAT_YV12,
@@ -48,6 +49,11 @@ void init_video_surface(int screen_width, int screen_height)
 
 
 
+}
+
+void destroy_texture()
+{
+	SDL_DestroyTexture(bmp);
 }
 
 void update_video_surface() 
