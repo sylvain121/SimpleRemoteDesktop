@@ -2,11 +2,18 @@
 #include "network.h"
 
 
+void init_video_fifo()
+{
+	video_fifo = malloc(sizeof(Video_Buffer));
+	video_fifo->first = NULL;	
+}
+
 int init_network()
 {
 
+	init_video_fifo();
 	inbuf_average = 0;
-
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Init network interface");
 	if(SDLNet_Init() < 0 ) {
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "SDLNet_Init: %s\n", SDLNet_GetError());
 		return 0;
@@ -18,17 +25,20 @@ int init_network()
 			       	configuration->server->port);
 		return 0;
 	} 
-
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "connecting to server");
 	if(!(control_socket = SDLNet_TCP_Open(&ip))) {
 		 SDL_LogError(SDL_LOG_CATEGORY_ERROR,"SDLNet_TCP_Open: %s\n", SDLNet_GetError());
 		return 0;
 	}
+	
+	netThread = SDL_CreateThread(network_thread, "network_thread", configuration);
 	return 0;
 }
 
 int SRDNet_send_start_packet() 
 {
 	// inital packet with information
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, " network : sending start packet");
 	struct Message init;
 	init.type = TYPE_ENCODER_START;
 	init.x = 1;
@@ -48,6 +58,7 @@ int SRDNet_send_start_packet()
 
 int SRDNet_send_stop_packet() 
 {
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, " network : sending stop packet");
 	struct Message stop;
 	stop.type = TYPE_ENCODER_STOP;
 	SDL_LogVerbose(SDL_LOG_CATEGORY_APPLICATION, "sending stop frame"); 
@@ -69,6 +80,22 @@ int SRDNet_get_frame_length()
 	return SRD_readUInt32();
 }
 
+
+void SRDNet_Empty_input_buffer()
+{
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "cleaning input tcp buffer");
+	char net_in[2048];
+	int i;
+
+	do {
+		i = SDLNet_TCP_Recv(control_socket, net_in, 1024);
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "%d bytes remains", i);
+	}
+	while( i > 0 );
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "cleaned");
+
+}
+
 void SRD_ensure(int nbytes )
 {
 	char net_in[nbytes+1];
@@ -79,7 +106,6 @@ void SRD_ensure(int nbytes )
 			// TCP Connection is broken. (because of error or closure)
 			     SDLNet_TCP_Close(control_socket);
 			     SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Broken socket disconnected");    
-			     return 0;
 			
 		}
 		else {
@@ -114,4 +140,74 @@ uint8_t * SRD_read(int nbytes)
 	memcpy(inbuf, inbuf+nbytes, inbuf_average - nbytes);
 	inbuf_average -= nbytes;
 	return data;
+}
+
+
+
+
+int network_thread(void* configuration) 
+{
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "starting network thread");
+	while(true) 
+	{
+		Video_Frame *frame = malloc(sizeof(Video_Frame));
+		
+		// get frame from network
+		frame->number = SRDNet_get_frame_number();
+		frame->length =  SRDNet_get_frame_length();
+
+		SRD_ensure(frame->length);
+		frame->data = SRD_read(frame->length);
+
+		Video_Frame_Element * element = malloc(sizeof(Video_Frame_Element));
+		element->frame = NULL;
+		element->next = NULL;
+		element->frame = frame;
+		push_to_video_fifo(element);
+
+
+	}
+}
+
+
+
+void push_to_video_fifo(Video_Frame_Element * element)
+{
+	if(video_fifo->first != NULL) {
+		Video_Frame_Element * current = video_fifo->first;
+		while(current->next != NULL) 
+		{
+			current = current->next;
+		}
+		current->next = element;
+
+	}
+	else 
+	{
+		video_fifo->first = element;
+	}
+}
+
+Video_Frame* pop_from_video_fifo()
+{
+	if(video_fifo->first != NULL)
+	{
+		Video_Frame_Element* element = video_fifo->first;
+		Video_Frame* frame = element->frame;
+		video_fifo->first = element->next;
+		//free(element); //FIXME
+		return frame;
+
+
+	} 
+	else
+	{
+		return NULL;
+	}
+
+}
+
+void clean_video_fifo()
+{
+	video_fifo->first = NULL; //FIXME
 }

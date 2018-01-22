@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "video_decoder.h"
+#include "video_surface.h"
 
 // compatibility with newer API
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55,28,1)
@@ -9,20 +10,17 @@
 #define av_frame_free avcodec_free_frame
 #endif
 
-int init_video_decoder(int codec_width, int codec_height, int fps) 
+int init_video_decoder(int codec_width, int codec_height, int screen_width, int screen_height)
 {
-	int             i, videoStream;
 	AVCodec         *pCodec = NULL;
-	float           aspect_ratio;
-	int pts, dts;
-	printf("starting with code resolution %dx%d", codec_width, codec_height);
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "starting with codec resolution %dx%d", codec_width, codec_height);
 	av_register_all();
 	avformat_network_init(); //FIXME alway use ?
 
 	// Find the decoder for the video stream
 	pCodec=avcodec_find_decoder(AV_CODEC_ID_H264);
 	if(pCodec==NULL) {
-		fprintf(stderr, "Unsupported codec!\n");
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unsupported codec!\n");
 		return -1; // Codec not found
 	}
 
@@ -33,7 +31,7 @@ int init_video_decoder(int codec_width, int codec_height, int fps)
 	pCodecCtx->pix_fmt = AV_PIX_FMT_YUV420P;
 
 
-	pCodecCtx->flags|= CODEC_FLAG_TRUNCATED;
+//	pCodecCtx->flags|= CODEC_FLAG_TRUNCATED; // FIXME not sure is used;
 
 
 	// Open codec
@@ -45,12 +43,13 @@ int init_video_decoder(int codec_width, int codec_height, int fps)
 
 
 	// initialize SWS context for software scaling
-	printf("initialize SWS context for software scaling\n ");
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "initialize SWS context for software scaling\n ");
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "input w: %d h: %d, output : w: %d, h: %d", pCodecCtx->width, pCodecCtx->height, screen_width, screen_height);
 	sws_ctx = sws_getContext(pCodecCtx->width,
 			pCodecCtx->height,
 			pCodecCtx->pix_fmt,
-			codec_width, 
-			codec_height,
+			screen_width, 
+			screen_height,
 			AV_PIX_FMT_YUV420P,
 			SWS_FAST_BILINEAR,
 			NULL,
@@ -65,13 +64,12 @@ int init_video_decoder(int codec_width, int codec_height, int fps)
 
 	parser = av_parser_init(pCodecCtx->codec_id);
 	parser->flags |= PARSER_FLAG_ONCE;
-
-	fprintf(stdout, "video width : %i, height : %i, fps : %i\n ", pCodecCtx->width, pCodecCtx->height, fps);
 	return 1; // TODO
 }
 
 void destroy_decoder()
 {
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, " Closing decoder");
 	avcodec_close(pCodecCtx);
 	av_free(pCodecCtx);
 	sws_freeContext(sws_ctx);
@@ -131,7 +129,7 @@ return 1; //TODO
 }
 
 
-void free_video_decoder()
+void free_video_decoder() //FIXME need to clean ?
 {
 	// Free the YUV frame
 	av_frame_free(&pFrame);

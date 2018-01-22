@@ -4,6 +4,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
+#include <SDL2/SDL_thread.h>
 
 #ifdef __MINGW32__
 #undef main /* Prevents SDL from overriding main() */
@@ -37,11 +38,34 @@ struct Message
 };
 
 
+typedef struct 
+{
+	int number;
+	int length;
+	uint8_t* data;
+	
+} Video_Frame;
+
+typedef struct Video_Frame_Element Video_Frame_Element;
+struct Video_Frame_Element
+{
+	Video_Frame *frame;
+	Video_Frame_Element * next;
+
+};
+
+typedef struct
+{
+	Video_Frame_Element * first;
+
+} Video_Buffer;
+
 IPaddress ip;
 TCPsocket control_socket;
+Video_Buffer *video_fifo;
+SDL_Thread *netThread;
 
-
-
+void SRDNet_Empty_input_buffer();
 int init_network();
 int SRDNet_get_frame_number();
 int SRDNet_get_frame_length();
@@ -50,3 +74,7 @@ int SRD_readUInt32();
 uint8_t * SRD_read(int nbytes);
 int SRDNet_send_start_packet(); 
 int SRDNet_send_stop_packet();
+Video_Frame* pop_from_video_fifo();
+void push_to_video_fifo(Video_Frame_Element * element);
+int network_thread(void* configuration); 
+void clean_video_fifo();

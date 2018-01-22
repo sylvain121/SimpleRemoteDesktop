@@ -37,7 +37,7 @@ void get_input_event()
                                 else
                                 {
                                     screen_is_fullscreen = true;
-                                    SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN);
+                                    SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN_DESKTOP);
 				   SRD_UpdateScreenResolution();
                                 } 
         

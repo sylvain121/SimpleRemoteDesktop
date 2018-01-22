@@ -1,10 +1,13 @@
 #include "config.h"
+#include "client.h"
 #include "video_surface.h"
 #include "video_decoder.h"
+#include "network.h"
 
 void init_video(int screen_width, int screen_height)
 {
 	// Make a screen to put our video
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, " Creating SDL windows size %dx%d", screen_width, screen_height);
 	screen = SDL_CreateWindow(
 			"StreamMyDesktop Client",
 			SDL_WINDOWPOS_UNDEFINED,
@@ -26,6 +29,7 @@ void init_video(int screen_width, int screen_height)
 
 void SRD_init_renderer_texture(int screen_width, int screen_height)
 {
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Creating Windows Texture %dx%d", screen_width, screen_height);
 	bmp = SDL_CreateTexture(
 			renderer,
 			SDL_PIXELFORMAT_YV12,
@@ -53,6 +57,7 @@ void SRD_init_renderer_texture(int screen_width, int screen_height)
 
 void destroy_texture()
 {
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Deleting SDL texture");
 	SDL_DestroyTexture(bmp);
 }
 
@@ -80,8 +85,25 @@ void SRD_UpdateScreenResolution()
 {
 	int w, h;
 	SDL_GetRendererOutputSize(renderer,&w, &h);
-	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "set screen size to width : %d, height : %d", w, h);
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, " switching resolution to %dx%d", w, h);
+	
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "halt video loop");
+	close_video_thread = true;
+
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "request stop Streaming");
+	SRDNet_send_stop_packet();
+	
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "waiting to thread stop");
+	SDL_WaitThread(thread, NULL);
+
+	
+	clean_video_fifo(); //FIXME
+
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "trying to set screen size to width : %d, height : %d", w, h);
 	configuration->screen->width = w;
 	configuration->screen->height = h;
+	
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "trying to start new video thread");
+	SRD_start_video();
 
 }
