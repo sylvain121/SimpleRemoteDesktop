@@ -61,20 +61,17 @@ server.listen(port, function() {
 });
 
 function messageHandler(data) {
-
 	buffer = Buffer.concat([buffer, data]);
 
-	while (buffer.length >= 44) {
+	while (buffer.length >= 40) {
 
 
 		var message = {
 			type: parseInt(read(4).readInt32LE().toString(), 10),
-			x: parseInt(read(4).readInt32LE().toString(), 10),
-			y: parseInt(read(4).readInt32LE().toString(), 10),
+			x: read(4).readFloatLE(),
+			y: read(4).readFloatLE(),
 			button: parseInt(read(4).readInt32LE().toString(), 10),
 			keycode: parseInt(read(4).readInt32LE().toString(), 10),
-			width: parseInt(read(4).readInt32LE().toString(), 10),
-			height: parseInt(read(4).readInt32LE().toString(), 10),
 			codecWidth: parseInt(read(4).readInt32LE().toString(), 10),
 			codecHeight: parseInt(read(4).readInt32LE().toString(), 10),
 			bandwidth: parseInt(read(4).readInt32LE().toString(), 10),

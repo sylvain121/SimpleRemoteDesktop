@@ -14,8 +14,6 @@ inputWidth: 0,
 	    inputHeight: 0,
 	    outputWidth: 0,
 	    outputHeight: 0,
-	    distantDisplayWidth: 0,
-	    distantDisplayHeight: 0,
 	    bit_rate: 10000000,
 	    fps: 60,
 	    sdl: 0,
@@ -38,61 +36,46 @@ function freeEncoder() {
 
 function free() {
 	running = false;
-	freeDesktop();
-	freeEncoder();
 	keyLoger.reset(x11.keyPressWithKeysym, function(){
 		x11.mouseButton(1, false);
 		x11.mouseButton(2, false);
-	})
+
+	});
 
 }
 
 
-module.exports.start = function(distantWidth, distantHeight, codecWidth, codecHeight, bandwidth, fps, sdl) {
+module.exports.start = function( codecWidth, codecHeight, bandwidth, fps, sdl) {
 
 	console.log("Starting new capture session");
 	options.outputWidth = codecWidth;
 	options.outputHeight = codecHeight;
-	options.distantDisplayWidth = distantWidth;
-	options.distantDisplayHeight = distantHeight;
 	options.bit_rate = bandwidth;
 	options.fps = fps;
 	options.sdl = sdl;
 	options.period = 1000 / options.fps;
 
 	frameCounter = 0;
-	getFrame();
-}
 
-module.exports.stop = function() {
-	running = false;
-	free();
+	x11.init();
+	if(options.sdl == 1) SDLKey.SDLKeyToKeySym_init();
+
+	var img = x11.getImage();
+	options.inputWidth = img.width;
+	options.inputHeight = img.height;
+	console.log("init video stream");
+	console.log(options);
+	encoder.initSync(options);
+	running = true;
+
+	getFrame();
 }
 
 
 function getFrame() {
 	var initTime = new Date();
-	if (!running) {
-		x11.init();
-		if(options.sdl == 1) SDLKey.SDLKeyToKeySym_init();
-	}
 
 	var img = x11.getImage();
-
-	if (options.inputWidth !== img.width || options.inputHeight !== img.height) {
-		console.log("resolution changed : reconfiguring encoder");
-		freeEncoder();
-		running = false;
-	}
-	if (!running) {
-		options.inputWidth = img.width;
-		options.inputHeight = img.height;
-		setMouseDistantScreenSize(options.distantDisplayWidth, options.distantDisplayHeight);
-		console.log("init video stream");
-		console.log(options);
-		encoder.initSync(options);
-		running = true;
-	}
 
 	var frame = encoder.encodeFrameSync(img.data);
 
@@ -115,6 +98,11 @@ function getFrame() {
 									if(running) {
 									setTimeout(getFrame, options.period - t);
 									}
+								else{
+									freeDesktop();
+									freeEncoder();
+	
+								}
 									});
 							});
 					});
@@ -134,22 +122,13 @@ function getFrame() {
  */
 
 
-var x_ratio = 0;
-var y_ratio = 0;
-
-
-module.exports.isConfigured = function() {
-	return x_ratio > 0 && y_ratio > 0;
-}
-
-function setMouseDistantScreenSize(width, height) {
-	x_ratio = options.inputWidth / width;
-	y_ratio = options.inputHeight / height;
-}
 
 module.exports.mouseMove = function(x, y) {
 	if (running) {
-		x11.mouseMove(x * x_ratio, y * y_ratio);
+		var x = parseInt(x *options.inputWidth, 10);
+		var y = parseInt(y * options.inputHeight, 10);
+		//console.log("x : "+x+" y : "+y);
+		x11.mouseMove(x,y);
 	};
 }
 

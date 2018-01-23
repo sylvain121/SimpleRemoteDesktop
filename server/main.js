@@ -24,10 +24,11 @@ function onNewMessage(message) {
             capture.mouseToggle(message.button);
             break;
         case 6:
-            capture.start(message.width, message.height, message.codecWidth, message.codecHeight, message.bandwidth, message.fps, message.sdl);
+            capture.start(message.codecWidth, message.codecHeight, message.bandwidth, message.fps, message.sdl);
             break;
         case 7:
-            capture.stop();
+	console.log("Receiving stop request !!!!!");
+            capture.free();
             break;
         default:
             break;
