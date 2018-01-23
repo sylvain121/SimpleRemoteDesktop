@@ -182,7 +182,7 @@ int video_thread(void* configuration)
 			SDL_LogVerbose(SDL_LOG_CATEGORY_APPLICATION, "frame number : %d, frame size : %d", frame->number, frame->length);
 			decode_video_frame(frame->data, frame->length, configuration); 
 			update_video_surface(); 
-			//free(frame); //FIXME
+			free(frame);
 
 		}
 

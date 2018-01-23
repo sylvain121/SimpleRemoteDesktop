@@ -198,7 +198,7 @@ Video_Frame* pop_from_video_fifo()
 		Video_Frame* frame = element->frame;
 		video_fifo->first = element->next;
 		video_fifo->length--;
-		//free(element); //FIXME
+		free(element);
 		return frame;
 
 
