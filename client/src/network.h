@@ -57,6 +57,7 @@ struct Video_Frame_Element
 typedef struct
 {
 	Video_Frame_Element * first;
+	int length;
 
 } Video_Buffer;
 

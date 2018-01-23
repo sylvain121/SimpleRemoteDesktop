@@ -83,27 +83,17 @@ void update_video_surface()
 }
 void SRD_UpdateScreenResolution() 
 {
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "=====================================================");
 	int w, h;
-	SDL_GetRendererOutputSize(renderer,&w, &h);
-	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, " switching resolution to %dx%d", w, h);
-	
-	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "halt video loop");
-	close_video_thread = true;
-
-	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "request stop Streaming");
-	SRDNet_send_stop_packet();
-	
-	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "waiting to thread stop");
-	SDL_WaitThread(thread, NULL);
-
-	
-	clean_video_fifo(); //FIXME
-
-	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "trying to set screen size to width : %d, height : %d", w, h);
+	SDL_GetWindowSize(screen, &w, &h);
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "codec resolution %dx%d , screen size : %dx%d",
+			configuration->codec->width,
+			configuration->codec->height,
+			w, h);
+	float x_ratio = (float)w / (float)configuration->codec->width;
+	float y_ratio = (float)h / (float)configuration->codec->height;
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, " new ratio x : %f, y %f", x_ratio, y_ratio);
+	SDL_RenderSetScale(renderer, x_ratio, y_ratio);
 	configuration->screen->width = w;
 	configuration->screen->height = h;
-	
-	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "trying to start new video thread");
-	SRD_start_video();
-
 }

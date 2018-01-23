@@ -5,7 +5,8 @@
 void init_video_fifo()
 {
 	video_fifo = malloc(sizeof(Video_Buffer));
-	video_fifo->first = NULL;	
+	video_fifo->first = NULL;
+	video_fifo->length = 0;	
 }
 
 int init_network()
@@ -186,6 +187,7 @@ void push_to_video_fifo(Video_Frame_Element * element)
 	{
 		video_fifo->first = element;
 	}
+	video_fifo->length++;
 }
 
 Video_Frame* pop_from_video_fifo()
@@ -195,6 +197,7 @@ Video_Frame* pop_from_video_fifo()
 		Video_Frame_Element* element = video_fifo->first;
 		Video_Frame* frame = element->frame;
 		video_fifo->first = element->next;
+		video_fifo->length--;
 		//free(element); //FIXME
 		return frame;
 

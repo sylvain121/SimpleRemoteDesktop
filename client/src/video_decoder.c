@@ -31,7 +31,7 @@ int init_video_decoder(int codec_width, int codec_height, int screen_width, int 
 	pCodecCtx->pix_fmt = AV_PIX_FMT_YUV420P;
 
 
-//	pCodecCtx->flags|= CODEC_FLAG_TRUNCATED; // FIXME not sure is used;
+	pCodecCtx->flags|= CODEC_FLAG_TRUNCATED; // FIXME not sure is used;
 
 
 	// Open codec
@@ -97,7 +97,7 @@ int decode_video_frame(uint8_t *frame,int frame_length, Configuration *conf)
 
 
 		if( lenght < 0 ) {
-			fprintf(stderr, "Error while decoding frame\n");
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error while decoding frame\n");
 		}
 		// Did we get a video frame?
 		if(frameFinished) {
