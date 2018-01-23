@@ -15,6 +15,12 @@ void init_video(int screen_width, int screen_height)
 			screen_width,
 			screen_height,
 			0);
+	int w, h;
+	SDL_GetWindowSize(screen, &w, &h);
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "codec resolution %dx%d , screen size : %dx%d",
+			configuration->codec->width,
+			configuration->codec->height,
+			w, h);
 
 
 	renderer = SDL_CreateRenderer(screen, -1, 0);
@@ -83,7 +89,7 @@ void update_video_surface()
 }
 void SRD_UpdateScreenResolution() 
 {
-	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "=====================================================");
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "======================= SWITCHING DISPLAYM MODE ===========================");
 	int w, h;
 	SDL_GetWindowSize(screen, &w, &h);
 	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "codec resolution %dx%d , screen size : %dx%d",
@@ -94,6 +100,5 @@ void SRD_UpdateScreenResolution()
 	float y_ratio = (float)h / (float)configuration->codec->height;
 	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, " new ratio x : %f, y %f", x_ratio, y_ratio);
 	SDL_RenderSetScale(renderer, x_ratio, y_ratio);
-	configuration->screen->width = w;
-	configuration->screen->height = h;
+
 }
