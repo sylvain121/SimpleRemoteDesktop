@@ -147,8 +147,8 @@ void SRD_start_video()
 
 void SRD_init_renderer(Configuration* configuration)
 {
-	SRD_init_renderer_texture(configuration->screen->width, configuration->screen->height);
-	init_video_decoder(configuration->codec->width, configuration->codec->height, configuration->screen->width, configuration->screen->height);
+	SRD_init_renderer_texture(configuration->codec->width, configuration->codec->height);
+	init_video_decoder(configuration->codec->width, configuration->codec->height);
 
 
 }

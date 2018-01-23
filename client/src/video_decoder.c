@@ -10,7 +10,7 @@
 #define av_frame_free avcodec_free_frame
 #endif
 
-int init_video_decoder(int codec_width, int codec_height, int screen_width, int screen_height)
+int init_video_decoder(int codec_width, int codec_height)
 {
 	AVCodec         *pCodec = NULL;
 	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "starting with codec resolution %dx%d", codec_width, codec_height);
@@ -44,12 +44,12 @@ int init_video_decoder(int codec_width, int codec_height, int screen_width, int 
 
 	// initialize SWS context for software scaling
 	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "initialize SWS context for software scaling\n ");
-	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "input w: %d h: %d, output : w: %d, h: %d", pCodecCtx->width, pCodecCtx->height, screen_width, screen_height);
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "input w: %d h: %d", pCodecCtx->width, pCodecCtx->height);
 	sws_ctx = sws_getContext(pCodecCtx->width,
 			pCodecCtx->height,
 			pCodecCtx->pix_fmt,
-			screen_width, 
-			screen_height,
+			pCodecCtx->width, 
+			pCodecCtx->height,
 			AV_PIX_FMT_YUV420P,
 			SWS_FAST_BILINEAR,
 			NULL,

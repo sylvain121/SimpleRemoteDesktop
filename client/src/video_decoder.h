@@ -20,6 +20,6 @@ Uint8 *yPlane, *uPlane, *vPlane;
 size_t yPlaneSz, uvPlaneSz;
 int uvPitch;
 
-int init_video_decoder(int codec_width, int codec_height, int screen_width, int screen_height);
+int init_video_decoder(int codec_width, int codec_height);
 int decode_video_frame(uint8_t *frame,int frame_length, Configuration *conf); 
 void destroy_decoder();
