@@ -21,7 +21,7 @@ int init_network()
 	}
 
 	if(SDLNet_ResolveHost(&ip, configuration->server->hostname, configuration->server->port) < 0) {
-		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "unable to resolve address %s , port %s \n", 
+		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "unable to resolve address %s , port %d\n", 
 				configuration->server->hostname,
 			       	configuration->server->port);
 		return 0;
@@ -50,7 +50,7 @@ int SRDNet_send_start_packet()
 	init.codec_width = configuration->codec->width;
 	init.codec_height = configuration->codec->height;
 	init.bandwidth = configuration->bandwidth;
-	init.sdl = 1;
+	init.sdl = 0;
 	SDL_LogVerbose(SDL_LOG_CATEGORY_APPLICATION, "sending init frame : type: %d, fps: %d, codec width: %d, codec height: %d, bandwidth: %d", init.type, init.fps, init.codec_width, init.codec_height, init.bandwidth);
 	SDLNet_TCP_Send(control_socket, (void * )&init, sizeof(init));
 	return 0;

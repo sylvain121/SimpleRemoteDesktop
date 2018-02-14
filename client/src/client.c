@@ -10,7 +10,7 @@
 #include "input.h"
 #include "video_decoder.h"
 #include "video_surface.h"
-
+#include "keysym_converter.h"
 
 //memset(inbuf+INBUF_SIZE, 0, FF_INPUT_BUFFER_PADDING_SIZE);
 
@@ -123,6 +123,7 @@ int main(int argc, char *argv[])
 		// TODO init network error
 		SRD_exit();
 	}
+	keysym_init();
 	init_video(configuration->screen->width, configuration->screen->height); //FIXME return status code
 	SRD_start_video();
 	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "start input event loop\n "); //EVENT LOOP FOR CATCH INPUT EVENT //TODO REFACTOR
