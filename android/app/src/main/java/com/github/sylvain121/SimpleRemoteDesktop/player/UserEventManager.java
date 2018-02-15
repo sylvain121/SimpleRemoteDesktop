@@ -1,5 +1,6 @@
 package com.github.sylvain121.SimpleRemoteDesktop.player;
 
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -101,5 +102,13 @@ class UserEventManager {
     public void setScreenSize(int width, int height) {
         this.screenWidth = width;
         this.screenHeight = height;
+    }
+
+    public void keyDown(int keyCode) {
+        DataManagerChannel.getInstance().sendKeyDown(keyCode);
+    }
+
+    public void keyUp(int keyCode) {
+        DataManagerChannel.getInstance().sendKeyUp(keyCode);
     }
 }

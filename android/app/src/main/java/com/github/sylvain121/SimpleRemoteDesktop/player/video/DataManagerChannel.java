@@ -200,4 +200,23 @@ public class DataManagerChannel {
             }
         }
     }
+
+    public void sendKeyDown(int keyCode) {
+        try {
+            output.write(Message.keyDown(keyCode).toBytes());
+            output.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendKeyUp(int keyCode) {
+        try {
+            output.write(Message.KeyUp(keyCode).toBytes());
+            output.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 }

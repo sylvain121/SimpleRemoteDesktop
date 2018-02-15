@@ -8,6 +8,7 @@ import android.hardware.input.InputManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.InputDevice;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -136,5 +137,19 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback, 
             Log.d(TAG, "Mouse Unplugged");
             this.MouseIsPresent = false;
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent keyEvent) {
+        Log.d(TAG, "key down "+keyCode);
+        userEventManager.keyDown(keyCode);
+        return true;
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent keyEvent) {
+        Log.d(TAG, "key up "+keyCode);
+        userEventManager.keyUp(keyCode);
+        return true;
     }
 }
