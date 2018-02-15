@@ -65,7 +65,6 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback, 
                 } else {
                     return userEventManager.genericMouseHandler(event);
                 }
-
             }
         });
 
@@ -90,15 +89,20 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback, 
         Log.d(TAG, "width : "+width+ "height : "+height);
 
         SharedPreferences sharedPreference = getBaseContext().getSharedPreferences(SettingsActivity.SIMPLE_REMOTE_DESKTOP_PREF, 0);
-
+        Log.d(TAG, "start h264 decoder");
         mediaCodec = new MediaCodecDecoderRenderer();
+        Log.d(TAG, "Set render target");
         mediaCodec.setRenderTarget(holder);
+        Log.d(TAG, "set H264 codec parameter");
         mediaCodec.setup(width, height);
-        userEventManager.setScreenSize(width, height);
-        mediaCodec.start();
 
+        userEventManager.setScreenSize(width, height);
+        Log.d(TAG, "Start H264 encoder");
+        mediaCodec.start();
+        Log.d(TAG, "init  network thread");
         cnx = new ConnectionThread(width, height, this.IPAddress, sharedPreference);
         cnx.setDecoderHandler(mediaCodec);
+        Log.d(TAG, "start network thread");
         cnx.start();
     }
 

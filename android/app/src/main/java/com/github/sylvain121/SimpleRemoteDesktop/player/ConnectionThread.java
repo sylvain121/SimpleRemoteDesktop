@@ -61,8 +61,11 @@ class ConnectionThread extends Thread {
 
     @Override
     public void run() {
+        Log.d(TAG, "getting network instance");
         m_renderSock = DataManagerChannel.getInstance();
+        Log.d(TAG, "connecting to serveur "+ipAddress+ " port "+ 8001);
         m_renderSock.connect(ipAddress, 8001);
+        Log.d(TAG, "Send start message");
         m_renderSock.sendStartStream(this.width, this.height, fps,codec_width, codec_height, bandwidth);
 
 
