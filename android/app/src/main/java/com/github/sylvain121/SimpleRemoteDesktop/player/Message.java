@@ -1,4 +1,4 @@
-package com.example.esme7383.myapplication;
+package com.github.sylvain121.SimpleRemoteDesktop.player;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -18,8 +18,8 @@ public class Message {
     public static int TYPE_ENCODER_STOP = 7;
 
     private int type = 0;
-    private int x = 0;
-    private int y = 0;
+    private float x = 0;
+    private float y = 0;
     private int button = 0;
     private int keyCode = 0;
     private int width = 0;
@@ -28,7 +28,7 @@ public class Message {
     private int codec_height = 0;
     private int bandwidth = 0;
     private int fps = 0;
-    private int sdl = 0; // always to 0 not a sdl client
+    private static int sdl = 0; // always to 0 not a sdl client
 
     public void setType(int type) {
         this.type = type;
@@ -83,7 +83,7 @@ public class Message {
         message.codec_width = codec_width;
         message.codec_height = codec_height;
         message.bandwidth = bandwidth;
-	message.sdl = sdl;
+	    message.sdl = sdl;
 
         return message;
 
@@ -94,8 +94,8 @@ public class Message {
         ByteBuffer bb = ByteBuffer.allocate(44);
         bb.order(ByteOrder.LITTLE_ENDIAN);
         bb.putInt(type);
-        bb.putInt(x);
-        bb.putInt(y);
+        bb.putFloat(x);
+        bb.putFloat(y);
         bb.putInt(button);
         bb.putInt(keyCode);
         bb.putInt(width);
@@ -114,8 +114,8 @@ public class Message {
         bb.clear();
         bb.order(ByteOrder.LITTLE_ENDIAN);
         bb.putInt(type);
-        bb.putInt(x);
-        bb.putInt(y);
+        bb.putFloat(x);
+        bb.putFloat(y);
         bb.putInt(button);
         bb.putInt(keyCode);
         bb.putInt(width);
@@ -130,7 +130,7 @@ public class Message {
         return bb;
     }
 
-    public static Message mouseMove(int x, int y) {
+    public static Message mouseMove(float x, float y) {
         Message message = new Message();
         message.type = TYPE_MOUSE_MOTION;
         message.x = x;

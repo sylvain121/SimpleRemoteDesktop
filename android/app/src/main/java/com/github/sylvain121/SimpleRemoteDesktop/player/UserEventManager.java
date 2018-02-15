@@ -21,6 +21,8 @@ class UserEventManager {
     private int rightMask = 2;
     private Boolean preLeft = false;
     private Boolean prevRight = false;
+    private int screenWidth = 0;
+    private int screenHeight = 0;
 
 
     public boolean genericMouseHandler(MotionEvent event) {
@@ -48,11 +50,15 @@ class UserEventManager {
     }
 
     private void sendMousePosition(float fx, float fy) {
-        int x = Math.round(fx);
-        int y = Math.round(fy);
+        if( screenWidth > 0 && screenHeight > 0) {
+            float x = fx / this.screenWidth;
+            float y = fy / this.screenHeight;
+            Log.d(TAG, "X : " + x + " Y : " + y);
+            DataManagerChannel.getInstance().sendMouseMotion(x, y);
+        }else {
+            Log.d(TAG, "Unable to send mouse position screen not initialized");
+        }
 
-        Log.d(TAG, "X : " + x + " Y : " + y);
-        DataManagerChannel.getInstance().sendMouseMotion(x, y);
     }
 
     private void sendMouseButtonUpdate(String buttonName, boolean isPressed) {
@@ -90,5 +96,10 @@ class UserEventManager {
                 break;
         }
         return true;
+    }
+
+    public void setScreenSize(int width, int height) {
+        this.screenWidth = width;
+        this.screenHeight = height;
     }
 }

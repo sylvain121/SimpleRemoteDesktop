@@ -114,7 +114,7 @@ public class DataManagerChannel {
 
     }
 
-    public void sendMouseMotion(int x, int y) {
+    public void sendMouseMotion(float x, float y) {
         try {
             output.write(Message.mouseMove(x, y).toBytes());
             output.flush();

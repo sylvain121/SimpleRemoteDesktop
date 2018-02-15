@@ -94,6 +94,7 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback, 
         mediaCodec = new MediaCodecDecoderRenderer();
         mediaCodec.setRenderTarget(holder);
         mediaCodec.setup(width, height);
+        userEventManager.setScreenSize(width, height);
         mediaCodec.start();
 
         cnx = new ConnectionThread(width, height, this.IPAddress, sharedPreference);
