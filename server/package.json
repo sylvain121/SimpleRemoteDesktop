@@ -1,7 +1,7 @@
 {
   "name": "StreamMyDesktopServer",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "src/main.js",
   "description": "",
   "author": "sylvain121",
   "email": "",
@@ -12,5 +12,11 @@
     "netmask": "^1.0.6",
     "node-avcodec-h264-encoder": "github:sylvain121/node-avcodec-h264-encoder",
     "node-x11": "github:sylvain121/node-X11"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.1",
+    "ts-node": "^8.10.1",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.2"
   }
 }

@@ -1,8 +1,10 @@
 /**
  * convert SDL keysym to X11 keysym
  * part of source code from gaminganywhere and X11
- * 
+ *
  */
+
+
 var keymap = {};
 
 /// macro
@@ -12,7 +14,7 @@ function SDL_SCANCODE_TO_KEYCODE(X) {
 }
 
 
-module.exports.SDLKeyToKeySym_init = function() {
+module.exports.SDLKeyToKeySym_init = () => {
     var i;
     //
     keymap['\b'.charCodeAt(0)] = 0xff08; //		= 8,
@@ -105,6 +107,4 @@ module.exports.SDLKeyToKeySym_init = function() {
 }
 
 
-module.exports.SDLKeyToKeySym = function(sdlkey) {
-    return keymap[sdlkey];
-}
+module.exports.SDLKeyToKeySym = sdlkey => keymap[sdlkey]
