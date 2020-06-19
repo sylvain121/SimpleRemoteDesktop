@@ -60,7 +60,7 @@ module.exports.start = function( codecWidth, codecHeight, bandwidth, fps, sdl) {
 	x11.init();
 	if(options.sdl == 1) SDLKey.SDLKeyToKeySym_init();
 
-	var img = x11.getImage();
+	var img = x11.getImageSync();
 	options.inputWidth = img.width;
 	options.inputHeight = img.height;
 	console.log("init video stream");
@@ -75,7 +75,7 @@ module.exports.start = function( codecWidth, codecHeight, bandwidth, fps, sdl) {
 function getFrame() {
 	var initTime = new Date();
 
-	var img = x11.getImage();
+	var img = x11.getImageSync();
 
 	var frame = encoder.encodeFrameSync(img.data);
 
