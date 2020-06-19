@@ -14,9 +14,13 @@ sudo apt-get install mingw-w64
 ```
 
 ## build for windows
+64bit system use Makefile_64bit_window_platform file. 
+32bit system use Makefile
 
+Type make cmd will generate the client.exe
 
 ## run the client
+copy the zip file into windows machine and run client.exe
 
 ```bash
 ./client hostname port 720p 10000000 30
