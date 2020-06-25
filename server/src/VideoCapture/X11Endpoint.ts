@@ -1,15 +1,26 @@
-import {getImageSync, init, keyPressWithKeysym, mouseButton, mouseMove, XImage} from 'node-x11'
+import { getImageSync, init, keyPressWithKeysym, mouseButton, mouseMove, XImage } from 'node-x11'
+import { ScreenOffsetOption } from '../core/SimpleRemoteDesktop';
 
 export class X11Endpoint {
     private width!: number;
     private height!: number;
 
-    constructor(display?: string) {
+    constructor(display?: string, private screenOffset?: ScreenOffsetOption) {
         init();
     }
 
     public getImage(): XImage {
-        const image = getImageSync(false);
+        let image;
+        if (this.screenOffset) {
+            image = getImageSync(
+                this.screenOffset.xoffset,
+                this.screenOffset.yoffset,
+                this.screenOffset.width,
+                this.screenOffset.height);
+
+        } else {
+            image = getImageSync();
+        }
         this.width = image.width;
         this.height = image.height;
 

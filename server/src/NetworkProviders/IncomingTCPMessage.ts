@@ -1,4 +1,17 @@
-export class IncomingMessage {
+export interface IMessage {
+    type: number;
+    x: number;
+    y: number;
+    button: number;
+    keycode: number;
+    codecWidth: number;
+    codecHeight: number;
+    bandwidth: number;
+    fps: number;
+    sdl: number;
+}
+
+export class IncomingTCPMessage implements IMessage {
     public static readonly MESSAGE_LENGTH = 40;
     public static readonly TYPE_KEYDOWN = 1;
     public static readonly TYPE_KEYUP = 2;
@@ -50,4 +63,19 @@ export class IncomingMessage {
     public get sdl(): number {
         return parseInt(this.chunk.readInt32LE(36).toString(), 10);
     }
+}
+
+
+export class IncomingWebRTCMessage implements IMessage {
+    bandwidth!: number;
+    button!: number;
+    codecHeight!: number;
+    codecWidth!: number;
+    fps!: number;
+    keycode!: number;
+    sdl!: number;
+    type!: number;
+    x!: number;
+    y!: number;
+
 }

@@ -1,14 +1,15 @@
-import {IncomingMessage} from "./IncomingMessage";
+import {IncomingTCPMessage} from "./IncomingTCPMessage";
 import {createServer, Server, Socket} from "net";
 import {EventEmitter} from "events";
 import {APPLICATION_EVENT, SimpleRemoteDesktop} from "../core/SimpleRemoteDesktop";
+
 
 export class TcpSocket {
     private server: Server;
     private userSocket!: Socket;
     private incomingBuffer: Buffer = new Buffer(0);
 
-    constructor(private listenPort: number) {
+    constructor(listenPort: number) {
         this.server = createServer((socket) => {
             console.log("new socket connected");
             if (!this.userSocket) {
@@ -27,12 +28,12 @@ export class TcpSocket {
             })
                 .on('data', (data) => {
                     this.incomingBuffer = Buffer.concat([this.incomingBuffer, data]);
-                    while (this.incomingBuffer.length >= IncomingMessage.MESSAGE_LENGTH) {
-                        const data = new Buffer(IncomingMessage.MESSAGE_LENGTH);
-                        this.incomingBuffer.copy(data, 0, 0, IncomingMessage.MESSAGE_LENGTH);
-                        this.incomingBuffer = this.incomingBuffer.slice(IncomingMessage.MESSAGE_LENGTH, this.incomingBuffer.length);
+                    while (this.incomingBuffer.length >= IncomingTCPMessage.MESSAGE_LENGTH) {
+                        const data = new Buffer(IncomingTCPMessage.MESSAGE_LENGTH);
+                        this.incomingBuffer.copy(data, 0, 0, IncomingTCPMessage.MESSAGE_LENGTH);
+                        this.incomingBuffer = this.incomingBuffer.slice(IncomingTCPMessage.MESSAGE_LENGTH, this.incomingBuffer.length);
 
-                        const message = new IncomingMessage(data);
+                        const message = new IncomingTCPMessage(data);
                         SimpleRemoteDesktop.App_event_bus.emit(APPLICATION_EVENT.NEW_INCOMING_MESSAGE, message);
                     }
                 })

@@ -7,11 +7,17 @@
   "email": "",
   "license": "GPL-3.0",
   "dependencies": {
-    "express": "^4.16.2",
+    "@types/body-parser": "^1.19.0",
+    "@types/commander": "^2.12.2",
+    "@types/express": "^4.17.6",
+    "body-parser": "^1.19.0",
+    "commander": "^5.1.0",
+    "express": "^4.17.1",
     "lodash": "^4.17.4",
     "netmask": "^1.0.6",
     "node-avcodec-h264-encoder": "github:sylvain121/node-avcodec-h264-encoder",
-    "node-x11": "github:sylvain121/node-X11"
+    "node-x11": "github:sylvain121/node-X11",
+    "node-pion-webrtc": "github:sylvain121/node-webrtc-endpoint"
   },
   "devDependencies": {
     "@types/node": "^14.0.1",
