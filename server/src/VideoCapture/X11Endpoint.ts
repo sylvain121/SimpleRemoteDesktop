@@ -1,30 +1,28 @@
-import { getImageSync, init, keyPressWithKeysym, mouseButton, mouseMove, XImage } from 'node-x11'
+import { getImage as X11GetImage, init, keyPressWithKeysym, mouseButton, mouseMove, GetImageCallback, XImage } from 'node-x11'
 import { ScreenOffsetOption } from '../core/SimpleRemoteDesktop';
 
 export class X11Endpoint {
-    private width!: number;
-    private height!: number;
+    public width!: number;
+    public height!: number;
 
     constructor(display?: string, private screenOffset?: ScreenOffsetOption) {
-        init();
+        const {width, height} = init();
+        this.width = width;
+        this.height = height;
     }
 
-    public getImage(): XImage {
-        let image;
+    public getImage(cb: GetImageCallback) {
         if (this.screenOffset) {
-            image = getImageSync(
+            X11GetImage(
                 this.screenOffset.xoffset,
                 this.screenOffset.yoffset,
                 this.screenOffset.width,
-                this.screenOffset.height);
+                this.screenOffset.height,
+                cb);
 
         } else {
-            image = getImageSync();
+            X11GetImage(undefined, undefined, undefined, undefined, cb);
         }
-        this.width = image.width;
-        this.height = image.height;
-
-        return image;
     }
 
     stop() {
@@ -38,14 +36,18 @@ export class X11Endpoint {
     }
 
     public mousebutton(button: number, isDown: boolean) {
-        mouseButton(button, isDown);
+        if (button  === 1 || button === 3) { //FIXME currently only support left and right click
+            mouseButton(button, isDown);
+        }
     }
 
     public keyDown(keycode: number) {
+        console.log("keydown", keycode);
         keyPressWithKeysym(keycode, true);
     }
 
     public keyUp(keycode: number) {
+        console.log("keyup", keycode);
         keyPressWithKeysym(keycode, false)
     }
 }

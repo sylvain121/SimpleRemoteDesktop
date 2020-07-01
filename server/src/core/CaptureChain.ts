@@ -1,8 +1,8 @@
-import {X11Endpoint} from "../VideoCapture/X11Endpoint";
-import {H264Encoder} from "../VideoCapture/H264Encoder";
-import {APPLICATION_EVENT, SimpleRemoteDesktop, StreamingInformation, ScreenOffsetOption} from "./SimpleRemoteDesktop";
+import { XImage } from 'node-x11';
+import { X11Endpoint } from "../VideoCapture/X11Endpoint";
+import { H264Encoder } from "../VideoCapture/H264Encoder";
+import { APPLICATION_EVENT, SimpleRemoteDesktop, StreamingInformation, ScreenOffsetOption } from "./SimpleRemoteDesktop";
 import Timeout = NodeJS.Timeout;
-import { SecureClientSessionOptions } from "http2";
 
 export class CaptureChain {
 
@@ -26,18 +26,18 @@ export class CaptureChain {
     }
 
     private start(message: StreamingInformation) {
-
-        this.msInterval = 1 / message.fps;
+        let i = 0;
+        this.msInterval = Math.trunc((1 / message.fps) * 1000);
         this.capture = new X11Endpoint(undefined, this.screenOffset);
-        this.encoder = new H264Encoder(message.codecWidth, message.codecHeight, message.bitrate, message.fps);
-        console.log("start interval");
+        this.encoder = new H264Encoder(this.capture.width, this.capture.height, message.codecWidth, message.codecHeight, message.bitrate, message.fps);
+        console.log("start interval", this.msInterval);
         this.interval = setInterval(() => {
-            //console.log("grabbing desktop");
-            const image = this.capture.getImage();
-            //console.log("compressing frame");
-            const encoded = this.encoder.compress(image);
+            this.capture.getImage((err: Error, image: XImage) => {
+                this.encoder.compress(image, (err: Error, encoded: Buffer) => {
+                    SimpleRemoteDesktop.App_event_bus.emit(APPLICATION_EVENT.NEW_ENCODED_FRAME, encoded);
+                });
+            });
 
-            SimpleRemoteDesktop.App_event_bus.emit(APPLICATION_EVENT.NEW_ENCODED_FRAME, encoded);
 
         }, this.msInterval);
     }

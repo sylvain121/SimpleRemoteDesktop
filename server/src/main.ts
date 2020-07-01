@@ -20,7 +20,10 @@ const app = new SimpleRemoteDesktop(program.port, program.enableWebrtc, program.
 
 
 
-function getCLipping(data: string): ScreenOffsetOption {
+function getCLipping(data: string): ScreenOffsetOption | undefined {
+    if (!data) {
+        return;
+    }
     const [offset, dimension] = data.split(":");
     const [xoffset, yoffset] = offset.split("+");
     const [width, height] = dimension.split("+");
@@ -31,6 +34,6 @@ function getCLipping(data: string): ScreenOffsetOption {
         parseInt(width, 10),
         parseInt(height, 10));
 
-        console.log(obj);
-        return obj
+    console.log(obj);
+    return obj
 }

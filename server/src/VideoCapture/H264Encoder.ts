@@ -1,31 +1,33 @@
-import {XImage} from "node-x11";
-import {AvcodecH264Encoder, encodeFrameSync, initSync, YUV_420P} from 'node-avcodec-h264-encoder';
+import { XImage } from "node-x11";
+import { AvcodecH264Encoder, encodeFrame, initSync, YUV_420P, EncoderCallback, encodeFrameSync } from 'node-avcodec-h264-encoder';
 
 export class H264Encoder {
     private firstframe = true;
 
-    constructor(private outputWidth: number,
-                private outputHeight: number,
-                private bitrate: number,
-                private fps: number) {
+    constructor(private inputWidth: number,
+        private inputHeight: number,
+        private outputWidth: number,
+        private outputHeight: number,
+        private bitrate: number,
+        private fps: number) {
+
+        const options: AvcodecH264Encoder = {
+            inputWidth: this.inputWidth,
+            inputHeight: this.inputHeight,
+            outputWidth: this.outputWidth,
+            outputHeight: this.outputHeight,
+            bit_rate: this.bitrate,
+            fps: this.fps,
+            sample: YUV_420P
+        }
+        console.log(options);
+        initSync(options);
 
     }
 
-    public compress(image: XImage): Buffer {
-        if (this.isFirstFrame()) {
-            const options: AvcodecH264Encoder = {
-                inputWidth: image.width,
-                inputHeight: image.height,
-                outputWidth: this.outputWidth,
-                outputHeight: this.outputHeight,
-                bit_rate: this.bitrate,
-                fps: this.fps,
-                sample: YUV_420P
-            }
-            console.log(options);
-            initSync(options);
-        }
-        return encodeFrameSync(image.data);
+    public compress(image: XImage, cb: EncoderCallback) {
+        const frame = encodeFrameSync(image.data);
+        cb(new Error(), frame);
     }
 
 

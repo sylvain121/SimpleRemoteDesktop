@@ -79,23 +79,30 @@ export class SimpleRemoteDesktop {
                 if (this.isSdlClient) {
                     keyUpcode = SDLKeyToKeySym(keyUpcode);
                 }
-                this.keylogger.keyDown(keyUpcode);
-                this.videoCapture.capture.keyDown(keyUpcode);
+                if(this.videoCapture.capture) {
+                this.videoCapture.capture.keyUp(keyUpcode);
+                }
                 break;
             case IncomingTCPMessage.TYPE_MOUSE_MOVE:
                 if (this.readonly)
                     return;
+                if(this.videoCapture.capture) {
                 this.videoCapture.capture.mouseMove(message.x, message.y);
+                }
                 break;
             case IncomingTCPMessage.TYPE_MOUSE_DOWN:
                 if (this.readonly)
                     return;
+                if(this.videoCapture.capture) {
                 this.videoCapture.capture.mousebutton(message.button, true);
+                }
                 break;
             case IncomingTCPMessage.TYPE_MOUSE_UP:
                 if (this.readonly)
                     return;
+                if(this.videoCapture.capture) {
                 this.videoCapture.capture.mousebutton(message.button, false);
+                }
                 break;
             case IncomingTCPMessage.TYPE_STREAM_START:
 
@@ -109,7 +116,7 @@ export class SimpleRemoteDesktop {
                     message.bandwidth,
                     message.fps
                 );
-
+                console.log('STTTTTTTTTTTTTTTARRRRTTTTTT');
                 SimpleRemoteDesktop.App_event_bus.emit(APPLICATION_EVENT.STREAMING_START, streamingMessage);
                 break;
 

@@ -119,26 +119,26 @@ function addInputEventHandler(element) {
 
     function onKeyDown(event) {
         if (event.repeat) return;
-        onKeyPress(event);
+        onKeyPress(event, true);
+
     }
 
     function onKeyUp(event) {
         if (event.repeat) return;
-        onKeyPress(event);
+        onKeyPress(event, false);
     }
 
-    function onKeyPress(event) {
-        console.log(event);
+    function onKeyPress(event, isDown) {
+        const message = {type: "keycode", keycode: event.keyCode, isDown};
+        console.log(message);
+        sendControl(message);
     }
 
     function onMouseButton(event) {
-        //console.log(event);
         const button = event.buttons ^ Button.prevState;
         Button.prevState = event.buttons;
         const isDown = event.type === "mousedown";
-
-        //console.log(button, isDown);
-        socket.send(JSON.stringify({type: "button", button: button, isDown: isDown}));
+        sendControl({type: "mouseButton", button, isDown})
 
     }
 
@@ -149,7 +149,7 @@ function addInputEventHandler(element) {
         var fx = x / element.offsetWidth;
         var fy = y / element.offsetHeight;
 
-        sendControl({type: "mouse", x: fx, y: fy});
+        sendControl({type: "mouseMove", x: fx, y: fy});
 
     }
 
