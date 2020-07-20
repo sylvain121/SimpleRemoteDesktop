@@ -8,7 +8,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "express": "^4.16.2",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.19",
     "netmask": "^1.0.6",
     "node-avcodec-h264-encoder": "github:sylvain121/node-avcodec-h264-encoder",
     "node-x11": "github:sylvain121/node-X11"
