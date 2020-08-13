@@ -138,7 +138,7 @@ uint8_t * SRD_read(int nbytes)
 	SDL_LogVerbose(SDL_LOG_CATEGORY_APPLICATION, "average byte : %d, read bytes : %d \n", inbuf_average, nbytes);
 	uint8_t *data = malloc(sizeof(uint8_t)* nbytes);
 	memcpy(data, inbuf, nbytes);	
-	memcpy(inbuf, inbuf+nbytes, inbuf_average - nbytes);
+	memmove(inbuf, inbuf+nbytes, inbuf_average - nbytes);
 	inbuf_average -= nbytes;
 	return data;
 }
